@@ -547,10 +547,6 @@
     </div>
     <button class="login-btn" onclick="doLogin()">Sign in →</button>
     <div class="login-error" id="loginError"></div>
-    <div class="login-divider"></div>
-    <div style="font-size:11px;color:var(--faint);text-align:center">
-      Demo credentials: any email · password <strong style="color:var(--muted)">smartbear</strong>
-    </div>
   </div>
 </div>
 
@@ -628,6 +624,7 @@ const PRODUCTS = {
       { id:'int',      icon:'🔗', name:'Integrations',          section:'Advanced' },
       { id:'reports',  icon:'📊', name:'System Reports',        section:'Advanced' },
       { id:'qi',       icon:'🤖', name:'QMetry Intelligence',   section:'Advanced' },
+      { id:'mcp',      icon:'🔌', name:'SmartBear MCP Server',  section:'AI Integration' },
     ],
     content: {
       intro: {
@@ -856,6 +853,40 @@ const PRODUCTS = {
             <li>Combine with <strong>Reflect MCP</strong> for a fully automated web + mobile testing loop</li>
           </ul>`
       },
+      mcp: {
+        basics: `<h3 class="qm">SmartBear MCP Server for QMetry</h3>
+          <p>The <strong>SmartBear MCP Server</strong> enables AI assistants to directly interact with QMetry test management data through the Model Context Protocol (MCP) - an open standard for connecting AI tools to external data sources.</p>
+          <ul>
+            <li><strong>What is MCP?</strong> Model Context Protocol - an open standard that lets AI assistants securely connect to external tools and data</li>
+            <li><strong>Package:</strong> <code>@smartbear/mcp</code> npm package - install once, access all SmartBear products</li>
+            <li><strong>Setup:</strong> Configure with your QMetry API key in Claude Desktop, Cursor, GitHub Copilot, or any MCP-compatible IDE</li>
+            <li><strong>Authentication:</strong> Uses your existing QMetry API credentials - no separate login required</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">AI-Powered Test Management Workflows</h3>
+          <p>With MCP, AI coding agents can perform test management operations directly from your IDE:</p>
+          <ul>
+            <li><strong>List and search tests:</strong> "Show me all failed tests from last sprint"</li>
+            <li><strong>Create test cases:</strong> "Generate test cases for the login flow"</li>
+            <li><strong>Execute test suites:</strong> "Run the regression suite and summarize results"</li>
+            <li><strong>Query test data:</strong> "What's our test coverage for user authentication?"</li>
+            <li><strong>Analyze results:</strong> "Compare this sprint's pass rate to last sprint"</li>
+            <li><strong>Integration with other tools:</strong> Combine QMetry data with BugSnag errors, Swagger APIs, and Reflect test execution</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Setup & Resources</h3>
+          <p><strong>Installation:</strong></p>
+          <ul>
+            <li>Install via npm: <code>npm install @smartbear/mcp</code></li>
+            <li>Configure in MCP client (Claude Desktop, Cursor, etc.) with your QMetry API key</li>
+            <li>Supported products: QMetry, Reflect, Swagger, BugSnag, Zephyr, PactFlow, Collaborator</li>
+          </ul>
+          <p><strong>Documentation & Resources:</strong></p>
+          <ul>
+            <li>Official docs: <a href="https://developer.smartbear.com/smartbear-mcp/docs/getting-started" target="_blank">developer.smartbear.com/smartbear-mcp</a></li>
+            <li>GitHub repo: <a href="https://github.com/SmartBear/smartbear-mcp" target="_blank">github.com/SmartBear/smartbear-mcp</a></li>
+            <li>MCP Registry: <a href="https://mcpservers.org/servers/smartbear/smartbear-mcp" target="_blank">mcpservers.org</a></li>
+            <li>Blog: <a href="https://smartbear.com/blog/how-to-orchestrate-testing-with-the-smartbear-mcp-server/" target="_blank">How to Orchestrate Testing with MCP</a></li>
+          </ul>`
+      },
     },
     flashcards: {
       intro: [
@@ -901,6 +932,10 @@ const PRODUCTS = {
         {q:'What is QQBot?',a:'QMetry\'s in-app AI chatbot for instant help, test suggestions, and natural language queries about your QA data'},
         {q:'What does the QMetry MCP server enable?',a:'AI coding agents to list, create, execute, and query tests autonomously via the Model Context Protocol'},
       ],
+      mcp:[
+        {q:'What is the SmartBear MCP Server?',a:'An npm package (@smartbear/mcp) that connects AI assistants to SmartBear tools like QMetry, Reflect, and Swagger via the Model Context Protocol'},
+        {q:'What can AI agents do with QMetry via MCP?',a:'List tests, create test cases, execute suites, query results, and analyze test data - all through natural language commands in your IDE'},
+      ],
     },
   },
 
@@ -921,6 +956,7 @@ const PRODUCTS = {
       { id:'suites',     icon:'🗂️', name:'Test Suites',          section:'Advanced' },
       { id:'cicd',       icon:'⚙️', name:'CI/CD Integration',    section:'Integrations' },
       { id:'allint',     icon:'🔗', name:'All Integrations',     section:'Integrations' },
+      { id:'mcp',        icon:'🔌', name:'SmartBear MCP Server',  section:'AI Integration' },
     ],
     content: {
       overview: {
@@ -1141,6 +1177,40 @@ const PRODUCTS = {
             <li>Custom integrations via REST API: Tests API + Suites API cover all operations</li>
           </ul>`
       },
+      mcp: {
+        basics: `<h3 class="rf">SmartBear MCP Server for Reflect</h3>
+          <p>The <strong>SmartBear MCP Server</strong> connects Reflect test automation to AI coding assistants via the Model Context Protocol, enabling agentic test workflows directly from your IDE.</p>
+          <ul>
+            <li><strong>Autonomous testing:</strong> AI agents can create, execute, and analyze Reflect tests without leaving your development environment</li>
+            <li><strong>Natural language control:</strong> "Run my checkout flow tests" or "Show me all failed mobile tests from yesterday"</li>
+            <li><strong>Setup:</strong> Install <code>@smartbear/mcp</code> package and configure with your Reflect API key</li>
+            <li><strong>Compatibility:</strong> Works with Claude Desktop, Cursor, GitHub Copilot, and any MCP-compatible IDE</li>
+          </ul>`,
+        intermediate: `<h3 class="rf">AI-Powered Test Automation Workflows</h3>
+          <p>MCP enables AI agents to perform Reflect operations through conversational commands:</p>
+          <ul>
+            <li><strong>Test discovery:</strong> "List all tests tagged with 'critical'"</li>
+            <li><strong>Execute test suites:</strong> "Run the smoke test suite on staging"</li>
+            <li><strong>Analyze results:</strong> "Compare this week's test results to last week"</li>
+            <li><strong>Debug failures:</strong> "Show me the screenshots from failed tests"</li>
+            <li><strong>Cross-product workflows:</strong> Combine with QMetry for test case management and BugSnag for error correlation</li>
+            <li><strong>CI/CD integration:</strong> Trigger Reflect tests as part of AI-orchestrated deployment pipelines</li>
+          </ul>`,
+        advanced: `<h3 class="rf">Resources & Documentation</h3>
+          <p><strong>Official Resources:</strong></p>
+          <ul>
+            <li>MCP Getting Started: <a href="https://developer.smartbear.com/smartbear-mcp/docs/getting-started" target="_blank">developer.smartbear.com/smartbear-mcp</a></li>
+            <li>Reflect MCP Guide: <a href="https://support.smartbear.com/reflect/docs/en/agentic-workflows-with-the-smartbear-mcp.html" target="_blank">Agentic Workflows with SmartBear MCP</a></li>
+            <li>GitHub Repository: <a href="https://github.com/SmartBear/smartbear-mcp" target="_blank">github.com/SmartBear/smartbear-mcp</a></li>
+            <li>Blog: <a href="https://smartbear.com/blog/how-to-orchestrate-testing-with-the-smartbear-mcp-server/" target="_blank">How to Orchestrate Testing with MCP</a></li>
+          </ul>
+          <p><strong>Setup Instructions:</strong></p>
+          <ul>
+            <li>Install: <code>npm install @smartbear/mcp</code></li>
+            <li>Configure with Reflect API key (get from Settings → Integrations)</li>
+            <li>Add to your MCP client configuration (Claude Desktop config.json, Cursor settings, etc.)</li>
+          </ul>`
+      },
     },
     flashcards: {
       overview: [
@@ -1183,6 +1253,10 @@ const PRODUCTS = {
         {q:'How does Reflect integrate with Jira on test failure?',a:'One click from the failed Test Run creates a Jira bug with video, step details, and logs automatically attached'},
         {q:'What is the "auto-link new tests" setting in Reflect?',a:'An option (enabled by default) that automatically maps new Reflect tests to their counterparts in connected TM tools (QMetry, TestRail, Xray, Zephyr)'},
       ],
+      mcp: [
+        {q:'What is the SmartBear MCP Server for Reflect?',a:'An npm package that connects AI assistants to Reflect test automation, enabling agents to create, execute, and analyze tests via natural language commands'},
+        {q:'What can AI agents do with Reflect via MCP?',a:'List tests, execute test suites, analyze results, debug failures, and orchestrate testing as part of AI-driven workflows - all from your IDE'},
+      ],
     },
   },
 
@@ -1203,6 +1277,7 @@ const PRODUCTS = {
       { id:'governance', icon:'✅', name:'API Governance',         section:'Advanced' },
       { id:'integrations',icon:'🔗', name:'Integrations',         section:'Integrations' },
       { id:'collaborate',icon:'👥', name:'Collaboration',         section:'Integrations' },
+      { id:'mcp',        icon:'🔌', name:'SmartBear MCP Server',  section:'AI Integration' },
     ],
     content: {
       overview: {
@@ -1444,6 +1519,41 @@ const PRODUCTS = {
             <li><strong>Confluence integration</strong> — embed Swagger Studio docs in Confluence for stakeholder review</li>
           </ul>`
       },
+      mcp: {
+        basics: `<h3 class="sw">SmartBear MCP Server for Swagger</h3>
+          <p>The <strong>SmartBear MCP Server</strong> brings Swagger Studio API management capabilities directly into AI-powered development workflows via the Model Context Protocol.</p>
+          <ul>
+            <li><strong>AI-driven API design:</strong> Let AI assistants create, validate, and standardize OpenAPI specifications</li>
+            <li><strong>Natural language API operations:</strong> "Create an OpenAPI spec for a user authentication API" or "What governance issues exist in my API?"</li>
+            <li><strong>Setup:</strong> Install <code>@smartbear/mcp</code> and authenticate with Swagger Studio credentials</li>
+            <li><strong>Works with:</strong> Claude Desktop, Cursor, GitHub Copilot, and any MCP-compatible environment</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">AI-Powered API Management</h3>
+          <p>MCP enables AI agents to interact with Swagger Studio through conversational commands:</p>
+          <ul>
+            <li><strong>API generation from prompts:</strong> "Generate an OpenAPI spec for a RESTful blog API with CRUD operations"</li>
+            <li><strong>Automatic standardization:</strong> AI can apply governance rules and fix spec violations automatically</li>
+            <li><strong>Query API definitions:</strong> "Show me all endpoints that lack security definitions"</li>
+            <li><strong>Manage domains:</strong> Access and use shared component libraries across APIs</li>
+            <li><strong>Code generation:</strong> "Generate a Python Flask server from this spec"</li>
+            <li><strong>Cross-product workflows:</strong> Combine Swagger specs with Reflect tests and QMetry test cases for end-to-end API quality</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Resources & Documentation</h3>
+          <p><strong>Official Resources:</strong></p>
+          <ul>
+            <li>MCP Getting Started: <a href="https://developer.smartbear.com/smartbear-mcp/docs/getting-started" target="_blank">developer.smartbear.com/smartbear-mcp</a></li>
+            <li>GitHub Repository: <a href="https://github.com/SmartBear/smartbear-mcp" target="_blank">github.com/SmartBear/smartbear-mcp</a></li>
+            <li>Blog: <a href="https://smartbear.com/blog/accelerating-model-context-protocol-mcp-journey-with-smartbear-api-hub/" target="_blank">Accelerating MCP Journey with Swagger</a></li>
+            <li>MCP Registry: <a href="https://mcpservers.org/servers/smartbear/smartbear-mcp" target="_blank">mcpservers.org</a></li>
+          </ul>
+          <p><strong>Remote MCP Server (No Installation):</strong></p>
+          <ul>
+            <li>Swagger Studio offers a <strong>Remote MCP Server</strong> — connect directly via URL without npm installation</li>
+            <li>Authentication via OAuth browser flow - no API tokens to manage</li>
+            <li>Available for: Swagger Studio, BugSnag, Zephyr</li>
+            <li>See Remote MCP Servers guide for per-client setup instructions</li>
+          </ul>`
+      },
     },
     flashcards: {
       overview: [
@@ -1485,6 +1595,10 @@ const PRODUCTS = {
       collaborate: [
         {q:"What are the three member roles in a Swagger Studio organization?",a:"Owner, Collaborator, Consumer"},
         {q:"What does forking an API do in Swagger Studio?",a:"Creates a copy of an API to propose changes — like GitHub forks"},
+      ],
+      mcp: [
+        {q:"What is the SmartBear MCP Server for Swagger?",a:"An npm package that enables AI assistants to create, manage, and standardize OpenAPI specs through natural language commands"},
+        {q:"What's unique about Swagger Studio's Remote MCP Server?",a:"It connects via URL with OAuth authentication - no npm installation or API tokens required, making it the easiest MCP setup"},
       ],
     },
   },

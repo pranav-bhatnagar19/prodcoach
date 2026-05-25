@@ -376,36 +376,6 @@
   }
   .prompt-chip:hover { border-color: var(--sb-orange); color: var(--sb-orange); }
 
-  /* Border control slider */
-  .border-control {
-    display: flex; align-items: center; gap: 12px; margin-top: 20px;
-    padding: 12px 16px; background: var(--surface2); border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  .border-control-label {
-    font-size: 11px; font-weight: 600; color: var(--muted);
-    letter-spacing: 0.05em; text-transform: uppercase; min-width: 100px;
-  }
-  .border-slider {
-    flex: 1; height: 5px; background: var(--border);
-    border-radius: 99px; outline: none; appearance: none;
-    cursor: pointer;
-  }
-  .border-slider::-webkit-slider-thumb {
-    appearance: none; width: 16px; height: 16px;
-    background: var(--sb-orange); border-radius: 50%;
-    cursor: pointer; border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,.2);
-  }
-  .border-slider::-moz-range-thumb {
-    width: 16px; height: 16px; background: var(--sb-orange);
-    border-radius: 50%; cursor: pointer; border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,.2);
-  }
-  .border-value {
-    font-size: 12px; font-weight: 600; color: var(--text);
-    font-family: 'JetBrains Mono', monospace; min-width: 40px; text-align: right;
-  }
 
   /* ── QUIZ ── */
   .quiz-wrap { max-width: 580px; }
@@ -477,7 +447,7 @@
   .msg-body {
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; padding: 9px 14px;
-    font-size: 13px; line-height: 1.6; color: var(--text2); max-width: 600px;
+    font-size: 13px; line-height: 1.6; color: var(--text2); max-width: 750px;
   }
   .msg.user .msg-body {
     background: var(--sb-orange-dim); border-color: var(--sb-orange-mid); color: var(--text);
@@ -1783,25 +1753,11 @@ function renderContent() {
     </div>
     <div class="lesson-card" id="lessonCard">${cont[activeTier]}</div>
     <div style="margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)">Quick questions</div>
-    <div class="quick-prompts">${promptsHtml}</div>
-    <div class="border-control">
-      <div class="border-control-label">Card border width</div>
-      <input type="range" class="border-slider" min="0" max="4" step="0.5" value="${currentBorder}" 
-        oninput="updateBorderWidth(this.value)"/>
-      <div class="border-value" id="borderValue">${currentBorder}px</div>
-    </div>`;
+    <div class="quick-prompts">${promptsHtml}</div>`;
 }
 
 function setTier(t) { activeTier = t; renderContent(); }
 
-function updateBorderWidth(value) {
-  document.documentElement.style.setProperty('--lesson-border-width', value + 'px');
-  document.getElementById('borderValue').textContent = value + 'px';
-  // Update all lesson cards
-  document.querySelectorAll('.lesson-card').forEach(card => {
-    card.style.borderWidth = value + 'px';
-  });
-}
 
 function adaptiveTierRecommendation() {
   const stats = attempts[product][activeModule];
@@ -1962,13 +1918,11 @@ async function sendChat() {
   input.value = '';
   addChatMsg('user', q);
   const P = PRODUCTS[product];
-  const m = P.modules.find(x=>x.id===activeModule);
-  const cont = P.content[activeModule];
   const area = document.getElementById('chatMessages');
   const typing = document.createElement('div');
   typing.className = 'msg coach';
   const c = P.color;
-  typing.innerHTML = `<div class="msg-avatar avatar-coach-${c}">◈</div><div class="msg-body typing">Thinking…</div>`;
+  typing.innerHTML = `<div class="msg-avatar avatar-coach-${c}">◈</div><div class="msg-body typing">Searching across all modules…</div>`;
   area.appendChild(typing);
   area.scrollTop = area.scrollHeight;
   
@@ -1976,69 +1930,105 @@ async function sendChat() {
   await new Promise(resolve => setTimeout(resolve, 800));
   
   try {
-    // Extract text content from all tiers
-    const basicsText = cont.basics.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    const intermediateText = cont.intermediate.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    const advancedText = cont.advanced.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    const allContent = basicsText + ' ' + intermediateText + ' ' + advancedText;
-    
-    // Simple keyword matching to find relevant content
+    // Extract keywords from question
     const qLower = q.toLowerCase();
     const keywords = qLower.split(/\s+/).filter(w => w.length > 3);
     
-    let answer = '';
+    // Search across ALL modules in current product
+    let bestMatch = null;
+    let bestScore = 0;
     
-    // Check if question is about a specific tier
-    if (qLower.includes('basic') || qLower.includes('getting started') || qLower.includes('intro')) {
-      answer = `From the Basics tier of ${m.name}: ${basicsText.substring(0, 400)}...`;
-    } else if (qLower.includes('intermediate') || qLower.includes('advanced features')) {
-      answer = `From the Intermediate tier: ${intermediateText.substring(0, 400)}...`;
-    } else if (qLower.includes('advanced') || qLower.includes('expert')) {
-      answer = `From the Advanced tier: ${advancedText.substring(0, 400)}...`;
-    } else {
-      // Search for keywords in content
-      let bestMatch = '';
-      let bestScore = 0;
+    for (const module of P.modules) {
+      const cont = P.content[module.id];
+      if (!cont) continue;
       
-      // Split content into sentences
-      const sentences = allContent.split(/[.!?]+/).filter(s => s.length > 20);
+      // Extract text from all tiers of this module
+      const basicsText = cont.basics.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const intermediateText = cont.intermediate.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const advancedText = cont.advanced.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const allContent = basicsText + ' ' + intermediateText + ' ' + advancedText;
+      
+      // Check if this is a tier-specific question
+      let tierContent = allContent;
+      let tierName = '';
+      if (qLower.includes('basic') || qLower.includes('getting started') || qLower.includes('intro')) {
+        tierContent = basicsText;
+        tierName = 'Basics';
+      } else if (qLower.includes('intermediate')) {
+        tierContent = intermediateText;
+        tierName = 'Intermediate';
+      } else if (qLower.includes('advanced') || qLower.includes('expert')) {
+        tierContent = advancedText;
+        tierName = 'Advanced';
+      }
+      
+      // Split into sentences and score each one
+      const sentences = tierContent.split(/[.!?]+/).filter(s => s.length > 20);
       
       for (const sentence of sentences) {
         const sentLower = sentence.toLowerCase();
         let score = 0;
+        
+        // Count keyword matches
         for (const keyword of keywords) {
-          if (sentLower.includes(keyword)) score++;
+          if (sentLower.includes(keyword)) {
+            score += 2; // Higher weight for keyword match
+          }
         }
+        
+        // Bonus points if module name matches question
+        if (qLower.includes(module.name.toLowerCase()) || module.name.toLowerCase().includes(qLower)) {
+          score += 3;
+        }
+        
+        // Update best match if this scores higher
         if (score > bestScore) {
           bestScore = score;
-          bestMatch = sentence.trim();
+          bestMatch = {
+            sentence: sentence.trim(),
+            module: module.name,
+            moduleId: module.id,
+            icon: module.icon,
+            tierName: tierName || 'all tiers',
+            fullContent: tierContent
+          };
         }
-      }
-      
-      if (bestMatch && bestScore > 0) {
-        // Find surrounding context
-        const startIdx = allContent.indexOf(bestMatch);
-        const contextStart = Math.max(0, startIdx - 100);
-        const contextEnd = Math.min(allContent.length, startIdx + bestMatch.length + 200);
-        answer = allContent.substring(contextStart, contextEnd).trim();
-        if (contextStart > 0) answer = '...' + answer;
-        if (contextEnd < allContent.length) answer = answer + '...';
-      } else {
-        // Provide general module overview
-        answer = `Here's what this module covers: ${basicsText.substring(0, 300)}... For more details, explore the Intermediate and Advanced tiers above.`;
       }
     }
     
-    // Add helpful suffix
-    if (!answer.includes('tier') && !answer.includes('Tier')) {
-      answer += `\n\nTip: Switch between Basics, Intermediate, and Advanced tiers above to explore ${m.name} in more depth.`;
+    let answer = '';
+    
+    if (bestMatch && bestScore > 0) {
+      // Found a good match - provide context around it
+      const startIdx = bestMatch.fullContent.indexOf(bestMatch.sentence);
+      const contextStart = Math.max(0, startIdx - 150);
+      const contextEnd = Math.min(bestMatch.fullContent.length, startIdx + bestMatch.sentence.length + 250);
+      let context = bestMatch.fullContent.substring(contextStart, contextEnd).trim();
+      
+      if (contextStart > 0) context = '...' + context;
+      if (contextEnd < bestMatch.fullContent.length) context = context + '...';
+      
+      // Format the answer with module reference
+      answer = `<strong>${bestMatch.icon} ${bestMatch.module}</strong> (${bestMatch.tierName}):\n\n${context}`;
+      
+      // Add navigation tip if not already in that module
+      if (bestMatch.moduleId !== activeModule) {
+        answer += `\n\n💡 <em>Tip: Click "${bestMatch.icon} ${bestMatch.module}" in the sidebar to explore this topic in depth.</em>`;
+      }
+    } else {
+      // No good match - provide overview
+      const currentModule = P.modules.find(m => m.id === activeModule);
+      const currentContent = P.content[activeModule];
+      const basicsText = currentContent.basics.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      
+      answer = `I couldn't find a specific match for "${q}" across ${P.label} modules.\n\nHere's an overview of the current module (${currentModule.icon} ${currentModule.name}):\n\n${basicsText.substring(0, 300)}...\n\n💡 <em>Try rephrasing your question or browse through the ${P.modules.length} modules in the sidebar.</em>`;
     }
     
     area.removeChild(typing);
     addChatMsg('coach', answer.replace(/\n/g,'<br>'));
   } catch(e) {
     area.removeChild(typing);
-    addChatMsg('coach', 'Sorry, I had trouble finding relevant information. Try rephrasing your question or explore the content tiers above.');
+    addChatMsg('coach', 'Sorry, I had trouble searching. Please try rephrasing your question.');
   }
 }
 </script>

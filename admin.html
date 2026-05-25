@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartBear Coach — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #F4F6FA;
+    --surface:   #FFFFFF;
+    --surface2:  #F0F2F7;
+    --border:    #DDE1EA;
+    --text:      #1C2136;
+    --text2:     #3D4660;
+    --muted:     #6B7594;
+    --faint:     #A8B0C8;
+    --sb-orange: #E8581A;
+    --sb-orange-dim: #E8581A15;
+    --qm:        #00A87A;
+    --qm-dim:    #00A87A14;
+    --rf:        #3B6EF5;
+    --rf-dim:    #3B6EF514;
+    --red:       #E53E3E;
+    --gold:      #D97706;
+    --green:     #00A87A;
+    --shadow-sm: 0 1px 3px rgba(28,33,54,.08);
+    --shadow-md: 0 4px 12px rgba(28,33,54,.10);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  .topnav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 28px; height:56px;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    box-shadow:var(--shadow-sm); position:sticky; top:0; z-index:100;
+  }
+  .nav-brand { display:flex; align-items:center; gap:12px; }
+  .nav-brand img { height:26px; }
+  .nav-brand-sep { width:1px; height:20px; background:var(--border); }
+  .nav-brand-label { font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:var(--text2); }
+  .admin-badge {
+    padding:3px 10px; background:var(--sb-orange-dim); color:var(--sb-orange);
+    border:1px solid #E8581A30; border-radius:20px;
+    font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .btn-sm {
+    padding:6px 14px; border-radius:6px; font-size:12px; font-weight:500;
+    cursor:pointer; border:1px solid var(--border);
+    background:transparent; color:var(--muted);
+    transition:all .12s; font-family:'Inter',sans-serif;
+  }
+  .btn-sm:hover { border-color:var(--sb-orange); color:var(--sb-orange); }
+
+  .page { max-width:1200px; margin:0 auto; padding:28px 24px; }
+
+  /* KPI Cards */
+  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:28px; }
+  .kpi-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:18px 20px; box-shadow:var(--shadow-sm);
+  }
+  .kpi-label { font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); margin-bottom:8px; }
+  .kpi-value { font-family:'Sora',sans-serif; font-size:28px; font-weight:700; color:var(--text); }
+  .kpi-sub { font-size:12px; color:var(--muted); margin-top:4px; }
+  .kpi-accent-orange { border-top:3px solid var(--sb-orange); }
+  .kpi-accent-qm { border-top:3px solid var(--qm); }
+  .kpi-accent-rf { border-top:3px solid var(--rf); }
+  .kpi-accent-gold { border-top:3px solid var(--gold); }
+
+  /* Sections */
+  .section { margin-bottom:28px; }
+  .section-title {
+    font-family:'Sora',sans-serif; font-size:15px; font-weight:700;
+    color:var(--text); margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-title .count {
+    font-size:11px; font-weight:600; background:var(--surface2);
+    color:var(--muted); padding:2px 8px; border-radius:20px;
+    border:1px solid var(--border); font-family:'Inter',sans-serif;
+  }
+
+  /* Table */
+  .table-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; overflow:hidden; box-shadow:var(--shadow-sm);
+  }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:var(--surface2); }
+  th {
+    padding:10px 16px; text-align:left; font-size:11px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--faint);
+    border-bottom:1px solid var(--border);
+  }
+  td { padding:11px 16px; font-size:13px; color:var(--text2); border-bottom:1px solid var(--border); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--surface2); }
+
+  .pill {
+    display:inline-block; padding:2px 10px; border-radius:20px;
+    font-size:11px; font-weight:600; letter-spacing:.04em;
+  }
+  .pill-qm  { background:var(--qm-dim);  color:var(--qm); }
+  .pill-rf  { background:var(--rf-dim);  color:var(--rf); }
+  .pill-ok  { background:#ECFDF5; color:#059669; }
+  .pill-warn{ background:#FFFBEB; color:var(--gold); }
+  .pill-fail{ background:#FEF2F2; color:var(--red); }
+
+  /* Progress mini-bar */
+  .mini-bar { width:80px; height:6px; background:var(--surface2); border-radius:99px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; border:1px solid var(--border); }
+  .mini-fill { height:100%; border-radius:99px; }
+  .mf-qm { background:var(--qm); }
+  .mf-rf  { background:var(--rf); }
+
+  /* Events feed */
+  .events-feed {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; max-height:340px; overflow-y:auto;
+    box-shadow:var(--shadow-sm);
+  }
+  .event-row {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 16px; border-bottom:1px solid var(--border); font-size:13px;
+  }
+  .event-row:last-child { border-bottom:none; }
+  .event-dot {
+    width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  }
+  .dot-login { background:#94a3b8; }
+  .dot-quiz_pass { background:var(--qm); }
+  .dot-quiz_fail { background:var(--red); }
+  .dot-module_view { background:var(--rf); }
+  .dot-chat_msg { background:var(--sb-orange); }
+  .event-meta { flex:1; }
+  .event-user { font-weight:600; color:var(--text); }
+  .event-type { color:var(--muted); }
+  .event-time { font-size:11px; color:var(--faint); white-space:nowrap; }
+
+  /* Two-col layout */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:720px) { .two-col { grid-template-columns:1fr; } }
+
+  /* Loading */
+  .loading { text-align:center; padding:40px; color:var(--muted); font-size:14px; }
+  .error-msg { text-align:center; padding:40px; color:var(--red); font-size:14px; }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-brand">
+    <!-- Replace src with your logo path or base64 -->
+    <span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--sb-orange)">SmartBear</span>
+    <div class="nav-brand-sep"></div>
+    <span class="nav-brand-label">Coach Admin</span>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <div class="nav-right">
+    <span id="adminEmail" style="font-size:12px;color:var(--muted)"></span>
+    <a href="index.html" class="btn-sm">← Back to Coach</a>
+    <button class="btn-sm" onclick="doAdminLogout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div id="adminContent">
+    <div class="loading">Loading dashboard data…</div>
+  </div>
+</div>
+
+<script type="module">
+import {
+  getSession, signOut,
+  getAdminSummary, getAdminLearners, getAdminEvents
+} from './supabase.js';
+
+window.doAdminLogout = async function() {
+  await signOut();
+  window.location.href = 'index.html';
+};
+
+// ── AUTH GUARD ───────────────────────────────────────────────
+const session = await getSession();
+if (!session) {
+  window.location.href = 'index.html';
+}
+document.getElementById('adminEmail').textContent = session.user.email;
+
+// ── LOAD DATA ────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [summary, learners, events] = await Promise.all([
+      getAdminSummary(),
+      getAdminLearners(),
+      getAdminEvents(60),
+    ]);
+    render(summary, learners, events);
+  } catch (e) {
+    document.getElementById('adminContent').innerHTML =
+      `<div class="error-msg">Error loading data: ${e.message}</div>`;
+  }
+}
+
+function masteryPill(avg) {
+  if (avg === null || avg === undefined) return `<span class="pill pill-warn">—</span>`;
+  if (avg >= 80) return `<span class="pill pill-ok">Expert ${avg}%</span>`;
+  if (avg >= 50) return `<span class="pill pill-warn">Learning ${avg}%</span>`;
+  return `<span class="pill pill-fail">Needs work ${avg}%</span>`;
+}
+
+function timeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h/24);
+  return `${d}d ago`;
+}
+
+const MODS_QM = 10;
+const MODS_RF = 10;
+
+function render(summary, learners, events) {
+  // ── KPIs
+  const s = summary || {};
+  const kpiHtml = `
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-accent-orange">
+        <div class="kpi-label">Total Learners</div>
+        <div class="kpi-value">${s.total_users ?? '—'}</div>
+        <div class="kpi-sub">Registered users</div>
+      </div>
+      <div class="kpi-card kpi-accent-qm">
+        <div class="kpi-label">Modules Completed</div>
+        <div class="kpi-value">${s.total_completions ?? '—'}</div>
+        <div class="kpi-sub">Across all learners</div>
+      </div>
+      <div class="kpi-card kpi-accent-rf">
+        <div class="kpi-label">Avg Quiz Score</div>
+        <div class="kpi-value">${s.avg_quiz_pct != null ? s.avg_quiz_pct + '%' : '—'}</div>
+        <div class="kpi-sub">All attempts</div>
+      </div>
+      <div class="kpi-card kpi-accent-gold">
+        <div class="kpi-label">Active (7 days)</div>
+        <div class="kpi-value">${s.active_last_7d ?? '—'}</div>
+        <div class="kpi-sub">Unique learners</div>
+      </div>
+    </div>`;
+
+  // ── LEARNER TABLE
+  const learnerRows = (learners || []).map(u => {
+    const qmCompleted = (u.module_progress || []).filter(p => p.product==='qmetry' && p.completed).length;
+    const rfCompleted = (u.module_progress || []).filter(p => p.product==='reflect' && p.completed).length;
+    const attempts    = (u.quiz_attempts || []).length;
+    const avgPct      = attempts > 0
+      ? Math.round((u.quiz_attempts || []).reduce((s,a) => s + (a.pct||0), 0) / attempts)
+      : null;
+    const lastActivity = (u.quiz_attempts || []).reduce((latest, a) =>
+      !latest || new Date(a.attempted_at) > new Date(latest) ? a.attempted_at : latest, null);
+    return { ...u, qmCompleted, rfCompleted, attempts, avgPct, lastActivity };
+  });
+
+  const learnerTableHtml = `
+    <div class="section">
+      <div class="section-title">
+        Learners
+        <span class="count">${learnerRows.length}</span>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Learner</th>
+              <th>QMetry progress</th>
+              <th>Reflect progress</th>
+              <th>Quiz attempts</th>
+              <th>Mastery</th>
+              <th>Last active</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${learnerRows.map(r => `
+              <tr>
+                <td>
+                  <div style="font-weight:600;color:var(--text)">${r.display_name || '—'}</div>
+                  <div style="font-size:11px;color:var(--faint)">${r.email}</div>
+                </td>
+                <td>
+                  <span style="font-size:13px">${r.qmCompleted}/${MODS_QM}</span>
+                  <span class="mini-bar"><span class="mini-fill mf-qm" style="width:${Math.round(r.qmCompleted/MODS_QM*100)}%"></span></span>
+                </td>
+                <td>
+                  <span style="font-size:13px">${r.rfCompleted}/${MODS_RF}</span>
+                  <span class="mini-bar"><span class="mini-fill mf-rf" style="width:${Math.round(r.rfCompleted/MODS_RF*100)}%"></span></span>
+                </td>
+                <td>${r.attempts}</td>
+                <td>${masteryPill(r.avgPct)}</td>
+                <td style="color:var(--muted)">${timeAgo(r.lastActivity)}</td>
+              </tr>`).join('')}
+            ${learnerRows.length === 0 ? `<tr><td colspan="6" style="text-align:center;color:var(--faint);padding:28px">No learners yet</td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  // ── EVENTS FEED + MODULE LEADERBOARD
+  const eventColors = {
+    login:'dot-login', quiz_pass:'dot-quiz_pass', quiz_fail:'dot-quiz_fail',
+    module_view:'dot-module_view', chat_msg:'dot-chat_msg',
+  };
+  const eventLabels = {
+    login:'signed in', quiz_pass:'passed quiz', quiz_fail:'failed quiz',
+    module_view:'viewed module', chat_msg:'asked a question',
+  };
+  const eventsHtml = `
+    <div class="section">
+      <div class="two-col">
+        <div>
+          <div class="section-title">Live activity feed</div>
+          <div class="events-feed">
+            ${(events || []).map(e => `
+              <div class="event-row">
+                <div class="event-dot ${eventColors[e.event_type] || 'dot-login'}"></div>
+                <div class="event-meta">
+                  <span class="event-user">${e.profiles?.display_name || e.profiles?.email || 'Unknown'}</span>
+                  <span class="event-type"> ${eventLabels[e.event_type] || e.event_type}
+                    ${e.module_id ? `<span style="color:var(--text2);font-weight:500">${e.module_id}</span>` : ''}
+                    ${e.product ? `<span class="pill pill-${e.product==='qmetry'?'qm':'rf'}" style="margin-left:4px">${e.product}</span>` : ''}
+                  </span>
+                </div>
+                <div class="event-time">${timeAgo(e.created_at)}</div>
+              </div>`).join('')}
+            ${(events || []).length === 0 ? '<div style="padding:28px;text-align:center;color:var(--faint)">No events yet</div>' : ''}
+          </div>
+        </div>
+        <div>
+          <div class="section-title">Top modules by completions</div>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Module</th><th>Product</th><th>Completions</th></tr></thead>
+              <tbody>
+                ${buildModuleLeaderboard(learners).map(row => `
+                  <tr>
+                    <td style="font-weight:500">${row.module_id}</td>
+                    <td><span class="pill pill-${row.product==='qmetry'?'qm':'rf'}">${row.product}</span></td>
+                    <td>${row.count}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('adminContent').innerHTML = kpiHtml + learnerTableHtml + eventsHtml;
+}
+
+function buildModuleLeaderboard(learners) {
+  const counts = {};
+  for (const u of (learners || [])) {
+    for (const p of (u.module_progress || [])) {
+      if (p.completed) {
+        const key = `${p.product}|${p.module_id}`;
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    }
+  }
+  return Object.entries(counts)
+    .map(([k, count]) => { const [product, module_id] = k.split('|'); return { product, module_id, count }; })
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

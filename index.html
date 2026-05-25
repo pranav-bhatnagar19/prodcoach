@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartBear Product Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  /* ── SMARTBEAR BRAND TOKENS ── */
+  /* Primary:  #E8581A (SmartBear orange) */
+  /* Dark:     #1A1A2E                   */
+  /* Grays:    #F7F8FA bg, #EEF0F4 surface, #DDE1E9 border */
+  :root {
+    --bg:        #F4F6FA;
+    --surface:   #FFFFFF;
+    --surface2:  #F0F2F7;
+    --border:    #DDE1EA;
+    --border2:   #C8CDD9;
+    --text:      #1C2136;
+    --text2:     #3D4660;
+    --muted:     #6B7594;
+    --faint:     #A8B0C8;
+
+    --sb-orange: #E8581A;
+    --sb-orange-dim: #E8581A15;
+    --sb-orange-mid: #E8581A30;
+    --sb-dark:   #1A1A2E;
+
+    /* QMetry — teal/green stays but slightly warmer */
+    --qm:        #00A87A;
+    --qm-dim:    #00A87A14;
+    --qm-mid:    #00A87A30;
+
+    /* Reflect — deeper blue */
+    --rf:        #3B6EF5;
+    --rf-dim:    #3B6EF514;
+    --rf-mid:    #3B6EF530;
+
+    /* Swagger — lime green */
+    --sw:        #85EA2D;
+    --sw-dim:    #85EA2D14;
+    --sw-mid:    #85EA2D30;
+
+    --red:       #E53E3E;
+    --gold:      #D97706;
+    --green:     #00A87A;
+
+    --shadow-sm: 0 1px 3px rgba(28,33,54,.08);
+    --shadow-md: 0 4px 12px rgba(28,33,54,.10);
+    --shadow-lg: 0 8px 28px rgba(28,33,54,.14);
+    
+    --lesson-border-width: 1px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ══════════════════════════════════════
+     LOGIN PAGE
+  ══════════════════════════════════════ */
+  #loginPage {
+    position: fixed; inset: 0; z-index: 999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #loginPage.hidden { display: none; }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    padding: 48px 44px 40px;
+    width: 400px;
+    max-width: 95vw;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .login-logo {
+    width: 180px; margin-bottom: 8px;
+  }
+  .login-tagline {
+    font-size: 12px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .login-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--text); text-align: center;
+    margin-bottom: 6px;
+  }
+  .login-sub {
+    font-size: 13px; color: var(--muted);
+    text-align: center; margin-bottom: 28px; line-height: 1.5;
+  }
+  .login-field {
+    width: 100%; margin-bottom: 14px;
+  }
+  .login-field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text2); margin-bottom: 6px; letter-spacing: 0.03em;
+  }
+  .login-input {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--bg);
+    outline: none; transition: border .15s;
+  }
+  .login-input:focus { border-color: var(--sb-orange); }
+  .login-btn {
+    width: 100%; padding: 12px;
+    background: var(--sb-orange); color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer; margin-top: 6px;
+    transition: opacity .15s, transform .1s;
+    letter-spacing: 0.02em;
+  }
+  .login-btn:hover { opacity: .92; transform: translateY(-1px); }
+  .login-btn:active { transform: none; }
+  .login-error {
+    font-size: 12px; color: var(--red);
+    text-align: center; margin-top: 10px;
+    min-height: 18px;
+  }
+  .login-divider {
+    width: 100%; height: 1px;
+    background: var(--border); margin: 24px 0;
+  }
+  .login-product-choice {
+    display: flex; gap: 10px; width: 100%; margin-bottom: 22px;
+  }
+  .product-choice-btn {
+    flex: 1; padding: 10px 8px; border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface); cursor: pointer;
+    font-size: 12px; font-weight: 600; text-align: center;
+    transition: all .15s; color: var(--muted);
+  }
+  .product-choice-btn:hover { border-color: var(--border2); color: var(--text); }
+  .product-choice-btn.sel-qm { border-color: var(--qm); color: var(--qm); background: var(--qm-dim); }
+  .product-choice-btn.sel-rf { border-color: var(--rf); color: var(--rf); background: var(--rf-dim); }
+  .product-choice-btn.sel-sw { border-color: var(--sw); color: var(--sw); background: var(--sw-dim); }
+  .product-choice-btn .pico { font-size: 18px; display: block; margin-bottom: 4px; }
+
+  /* ══════════════════════════════════════
+     APP SHELL
+  ══════════════════════════════════════ */
+  #appShell { display: flex; flex-direction: column; height: 100vh; }
+  #appShell.hidden { display: none; }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .nav-brand img { height: 28px; }
+  .nav-brand-sep {
+    width: 1px; height: 22px; background: var(--border);
+  }
+  .nav-brand-label {
+    font-family: 'Sora', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--text2); letter-spacing: 0.02em;
+  }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1.5px solid transparent;
+    background: transparent; color: var(--muted);
+    transition: all .15s; font-family: 'Inter', sans-serif;
+  }
+  .nav-tab:hover { background: var(--surface2); color: var(--text); }
+  .nav-tab.active-qm { background: var(--qm-dim); color: var(--qm); border-color: var(--qm-mid); }
+  .nav-tab.active-rf { background: var(--rf-dim); color: var(--rf); border-color: var(--rf-mid); }
+  .nav-tab.active-sw { background: var(--sw-dim); color: var(--sw); border-color: var(--sw-mid); }
+  .nav-logout {
+    padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    transition: all .15s; font-family: 'Inter', sans-serif;
+  }
+  .nav-logout:hover { border-color: var(--border2); color: var(--text); }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 260px; min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .sidebar-header {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .product-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .badge-qm { background: var(--qm-dim); color: var(--qm); border: 1px solid var(--qm-mid); }
+  .badge-rf { background: var(--rf-dim); color: var(--rf); border: 1px solid var(--rf-mid); }
+  .badge-sw { background: var(--sw-dim); color: var(--sw); border: 1px solid var(--sw-mid); }
+
+  .sidebar-desc {
+    font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 12px;
+  }
+  .progress-bar-wrap {}
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-bottom: 5px;
+  }
+  .progress-track {
+    height: 5px; background: var(--surface2);
+    border-radius: 99px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px; transition: width .5s ease;
+  }
+  .fill-qm { background: var(--qm); }
+  .fill-rf { background: var(--rf); }
+  .fill-sw { background: var(--sw); }
+
+  .module-list { padding: 8px 8px; flex: 1; }
+  .module-section { margin-bottom: 4px; }
+  .module-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--faint);
+    padding: 8px 8px 3px;
+  }
+  .module-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: 7px; cursor: pointer;
+    font-size: 13px; color: var(--muted);
+    transition: all .12s;
+    border: 1px solid transparent;
+  }
+  .module-item:hover { background: var(--surface2); color: var(--text); }
+  .module-item.active-qm {
+    background: var(--qm-dim); color: var(--qm);
+    border-color: var(--qm-mid); font-weight: 500;
+  }
+  .module-item.active-rf {
+    background: var(--rf-dim); color: var(--rf);
+    border-color: var(--rf-mid); font-weight: 500;
+  }
+  .module-item.active-sw {
+    background: var(--sw-dim); color: var(--sw);
+    border-color: var(--sw-mid); font-weight: 500;
+  }
+  .module-item.active-sw {
+    background: var(--rf-dim); color: var(--rf);
+    border-color: var(--rf-mid); font-weight: 500;
+  }
+  .module-item.active-sw {
+    background: var(--sw-dim); color: var(--sw);
+    border-color: var(--sw-mid); font-weight: 500;
+  }
+  .module-icon { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; }
+  .module-name { flex: 1; }
+  .module-done { font-size: 11px; }
+
+  .mode-toggle {
+    display: flex; gap: 6px; padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .toggle-btn {
+    flex: 1; padding: 7px; border-radius: 7px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border);
+    background: transparent; color: var(--muted);
+    transition: all .12s; font-family: 'Inter', sans-serif;
+  }
+  .toggle-btn:hover { border-color: var(--border2); color: var(--text); }
+  .toggle-btn.active-qm { background: var(--qm-dim); color: var(--qm); border-color: var(--qm-mid); }
+  .toggle-btn.active-rf { background: var(--rf-dim); color: var(--rf); border-color: var(--rf-mid); }
+  .toggle-btn.active-sw { background: var(--sw-dim); color: var(--sw); border-color: var(--sw-mid); }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .content-area {
+    flex: 1; overflow-y: auto; padding: 24px 28px 16px;
+  }
+  .content-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 20px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .content-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--text);
+  }
+  .tier-tabs {
+    display: flex; gap: 3px;
+    background: var(--surface2); padding: 3px; border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .tier-tab {
+    padding: 5px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; border: none;
+    background: transparent; color: var(--muted);
+    transition: all .12s; font-family: 'Inter', sans-serif;
+  }
+  .tier-tab:hover { color: var(--text); background: var(--surface); }
+  .tier-tab.active-qm { background: var(--qm); color: #fff; }
+  .tier-tab.active-rf { background: var(--rf); color: #000; }
+  .tier-tab.active-sw { background: var(--sw); color: #000; }
+
+  .lesson-card {
+    background: var(--surface);
+    border: var(--lesson-border-width) solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 12px;
+    line-height: 1.7; font-size: 14px; color: var(--text2);
+    box-shadow: var(--shadow-sm);
+  }
+  .lesson-card h3 {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
+    text-transform: uppercase; margin-bottom: 12px;
+    font-family: 'Sora', sans-serif;
+  }
+  .lesson-card h3.qm { color: var(--qm); }
+  .lesson-card h3.rf { color: var(--rf); }
+  .lesson-card h3.sw { color: var(--sw); }
+  .lesson-card p { margin-bottom: 10px; }
+  .lesson-card ul { padding-left: 20px; }
+  .lesson-card li { margin-bottom: 6px; }
+  .lesson-card ol { padding-left: 20px; }
+  .lesson-card strong { color: var(--text); font-weight: 600; }
+  .lesson-card code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--surface2); color: var(--sb-orange);
+    padding: 1px 6px; border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .quick-prompts {
+    display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px;
+  }
+  .prompt-chip {
+    padding: 5px 13px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    transition: all .12s; box-shadow: var(--shadow-sm);
+  }
+  .prompt-chip:hover { border-color: var(--sb-orange); color: var(--sb-orange); }
+
+  /* Border control slider */
+  .border-control {
+    display: flex; align-items: center; gap: 12px; margin-top: 20px;
+    padding: 12px 16px; background: var(--surface2); border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .border-control-label {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    letter-spacing: 0.05em; text-transform: uppercase; min-width: 100px;
+  }
+  .border-slider {
+    flex: 1; height: 5px; background: var(--border);
+    border-radius: 99px; outline: none; appearance: none;
+    cursor: pointer;
+  }
+  .border-slider::-webkit-slider-thumb {
+    appearance: none; width: 16px; height: 16px;
+    background: var(--sb-orange); border-radius: 50%;
+    cursor: pointer; border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  }
+  .border-slider::-moz-range-thumb {
+    width: 16px; height: 16px; background: var(--sb-orange);
+    border-radius: 50%; cursor: pointer; border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  }
+  .border-value {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    font-family: 'JetBrains Mono', monospace; min-width: 40px; text-align: right;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-wrap { max-width: 580px; }
+  .quiz-q {
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    margin-bottom: 20px; color: var(--text);
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+  .quiz-opt {
+    padding: 12px 18px; border-radius: 9px; font-size: 14px;
+    cursor: pointer; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text2);
+    transition: all .12s; text-align: left;
+    font-family: 'Inter', sans-serif;
+    box-shadow: var(--shadow-sm);
+  }
+  .quiz-opt:hover { border-color: var(--border2); color: var(--text); }
+  .quiz-opt.correct { background: var(--qm-dim); border-color: var(--qm); color: var(--qm); }
+  .quiz-opt.correct-rf { background: var(--rf-dim); border-color: var(--rf); color: var(--rf); }
+  .quiz-opt.wrong { background: #FFF0F0; border-color: var(--red); color: var(--red); }
+  .quiz-feedback {
+    padding: 13px 18px; border-radius: 9px;
+    font-size: 13px; line-height: 1.6; margin-bottom: 14px;
+  }
+  .fb-correct { background: var(--qm-dim); color: var(--qm); border: 1px solid var(--qm-mid); }
+  .fb-correct-rf { background: var(--rf-dim); color: var(--rf); border: 1px solid var(--rf-mid); }
+  .fb-correct-sw { background: var(--sw-dim); color: var(--sw); border: 1px solid var(--sw-mid); }
+  .fb-wrong { background: #FFF0F0; color: var(--red); border: 1px solid #FECACA; }
+  .score-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    background: var(--surface2); color: var(--gold);
+    border: 1px solid var(--border);
+  }
+  .next-btn {
+    padding: 10px 24px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; margin-top: 6px;
+    transition: all .12s; font-family: 'Inter', sans-serif;
+  }
+  .next-btn:hover { opacity: .88; }
+  .next-qm { background: var(--qm); color: #fff; }
+  .next-rf { background: var(--rf); color: #000; }
+  .next-sw { background: var(--sw); color: #000; }
+  .next-neutral { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+  /* ── CHAT ── */
+  .chat-area {
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    max-height: 300px; background: var(--surface);
+    flex-shrink: 0;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto;
+    padding: 14px 20px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .msg { display: flex; gap: 9px; align-items: flex-start; }
+  .msg-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    border: 1.5px solid var(--border);
+  }
+  .avatar-coach-qm { background: var(--qm-dim); color: var(--qm); }
+  .avatar-coach-rf { background: var(--rf-dim); color: var(--rf); }
+  .avatar-coach-sw { background: var(--sw-dim); color: var(--sw); }
+  .avatar-user { background: var(--surface2); color: var(--muted); }
+  .msg-body {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 9px 14px;
+    font-size: 13px; line-height: 1.6; color: var(--text2); max-width: 600px;
+  }
+  .msg.user .msg-body {
+    background: var(--sb-orange-dim); border-color: var(--sb-orange-mid); color: var(--text);
+  }
+  .chat-input-row {
+    display: flex; gap: 8px; padding: 10px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .chat-input {
+    flex: 1; background: var(--bg); border: 1.5px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 8px 14px;
+    font-size: 13px; font-family: 'Inter', sans-serif; outline: none;
+    transition: border .12s;
+  }
+  .chat-input:focus { border-color: var(--sb-orange); }
+  .chat-send {
+    padding: 8px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: opacity .12s;
+    background: var(--sb-orange); color: #fff;
+    font-family: 'Inter', sans-serif;
+  }
+  .chat-send:hover { opacity: .88; }
+  .typing { color: var(--muted); font-style: italic; font-size: 13px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════ -->
+<div id="loginPage">
+  <div class="login-card">
+    <img class="login-logo" src="data:image/jpeg;base64,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" alt="SmartBear"/>
+    <div class="login-tagline">Product Learning Coach</div>
+    <div class="login-title">Welcome back</div>
+    <div class="login-sub">Sign in to continue your learning journey</div>
+
+    <div class="login-product-choice">
+      <button class="product-choice-btn sel-qm" id="choiceQM" onclick="selectLoginProduct('qmetry')">
+        <span class="pico">🧪</span>
+        QMetry
+      </button>
+      <button class="product-choice-btn" id="choiceRF" onclick="selectLoginProduct('reflect')">
+        <span class="pico">🔭</span>
+        Reflect
+      </button>
+      <button class="product-choice-btn" id="choiceSW" onclick="selectLoginProduct('swagger')">
+        <span class="pico">📐</span>
+        Swagger
+      </button>
+    </div>
+
+    <div class="login-field">
+      <label>Email address</label>
+      <input class="login-input" id="loginEmail" type="email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input class="login-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign in →</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-divider"></div>
+    <div style="font-size:11px;color:var(--faint);text-align:center">
+      Demo credentials: any email · password <strong style="color:var(--muted)">smartbear</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════ -->
+<div id="appShell" class="hidden">
+  <nav class="topnav">
+    <div class="nav-brand">
+      <img src="data:image/jpeg;base64,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" alt="SmartBear"/>
+      <div class="nav-brand-sep"></div>
+      <span class="nav-brand-label">Product Coach</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-tabs">
+        <button class="nav-tab active-qm" id="tabQM" onclick="switchProduct('qmetry')">QMetry</button>
+        <button class="nav-tab" id="tabRF" onclick="switchProduct('reflect')">Reflect</button>
+        <button class="nav-tab" id="tabSW" onclick="switchProduct('swagger')">Swagger</button>
+      </div>
+      <button class="nav-logout" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="product-badge badge-qm" id="productBadge">QMetry TM</div>
+        <div class="sidebar-desc" id="sidebarDesc">Test management & QA lifecycle platform</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label">
+            <span id="progressText">0 / 10 modules complete</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill fill-qm" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="module-list" id="moduleList"></div>
+      <div class="mode-toggle">
+        <button class="toggle-btn active-qm" id="btnLearn" onclick="setMode('learn')">📖 Learn</button>
+        <button class="toggle-btn" id="btnQuiz" onclick="setMode('quiz')">🎯 Quiz</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="content-area" id="contentArea"></div>
+      <div class="chat-area">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" placeholder="Ask anything about this product…" onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="chat-send" id="sendBtn" onclick="sendChat()">Ask →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = {
+  qmetry: {
+    label: 'QMetry TM',
+    desc: 'Test management & QA lifecycle platform',
+    badgeClass: 'badge-qm',
+    color: 'qm',
+    accent: '#00c896',
+    modules: [
+      { id:'intro',    icon:'🚀', name:'Getting Started',       section:'Foundations' },
+      { id:'apps',     icon:'🧩', name:'QMetry Apps',           section:'Foundations' },
+      { id:'req',      icon:'📋', name:'Requirements',          section:'Core Workflow' },
+      { id:'tc',       icon:'✅', name:'Test Cases',            section:'Core Workflow' },
+      { id:'suites',   icon:'📁', name:'Test Suites',           section:'Core Workflow' },
+      { id:'issues',   icon:'🐛', name:'Issues & Defects',      section:'Core Workflow' },
+      { id:'explore',  icon:'🔍', name:'Exploratory Testing',   section:'Advanced' },
+      { id:'int',      icon:'🔗', name:'Integrations',          section:'Advanced' },
+      { id:'reports',  icon:'📊', name:'System Reports',        section:'Advanced' },
+      { id:'qi',       icon:'🤖', name:'QMetry Intelligence',   section:'Advanced' },
+    ],
+    content: {
+      intro: {
+        basics: `<h3 class="qm">Getting Started</h3>
+          <p>QMetry is an enterprise test management platform that supports both <strong>Agile (Scrum/Kanban)</strong> and <strong>waterfall</strong> methodologies. It centralises your entire QA lifecycle — from requirements to defect closure.</p>
+          <ul>
+            <li><strong>5 setup steps:</strong> Log in → Create project → Configure users/roles → Select modules → Connect integrations</li>
+            <li>Projects can be templated for faster setup across teams</li>
+            <li>Supports cloud, on-premise, and the embedded Jira app (QTM4J)</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Project Configuration</h3>
+          <p>After creating a project, the key steps to configure it for production use:</p>
+          <ul>
+            <li><strong>Custom fields</strong> — add fields specific to your domain (priority, platform, environment)</li>
+            <li><strong>User roles</strong> — assign Test Manager, Tester, Developer, Viewer roles with appropriate permissions</li>
+            <li><strong>Modules</strong> — enable only what you need: Requirements, Test Cases, Suites, Issues, Explorer</li>
+            <li><strong>Sprints/Cycles</strong> — map to your Scrum sprints or waterfall release cycles</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Scaling & Architecture</h3>
+          <ul>
+            <li><strong>QTM4J</strong> — Cloud Fortified Atlassian app, fully embedded in Jira. Best when your team lives in Jira.</li>
+            <li><strong>QTM Enterprise</strong> — standalone multi-tool environment, best for organisations working outside Jira</li>
+            <li><strong>Data migration</strong> — import from Excel, TestRail, Xray, or Zephyr using QMetry's migration wizard</li>
+            <li><strong>Multi-project reporting</strong> — cross-project dashboards aggregate quality KPIs at portfolio level</li>
+          </ul>`
+      },
+      apps: {
+        basics: `<h3 class="qm">QMetry Apps Overview</h3>
+          <p>QMetry ships as two complementary products:</p>
+          <ul>
+            <li><strong>QTM4J (QMetry for Jira)</strong> — embedded inside Atlassian Cloud/Data Center. Cloud Fortified certified, StaffPick on Marketplace. Best for Jira-first teams.</li>
+            <li><strong>QTM Enterprise</strong> — standalone QA platform with its own UI. Supports teams outside the Atlassian ecosystem.</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">App Selection Guide</h3>
+          <ul>
+            <li>Choose <strong>QTM4J</strong> when: your team manages backlogs in Jira, you want native issue linking, and your org is on Atlassian Cloud</li>
+            <li>Choose <strong>QTM Enterprise</strong> when: you work with Azure DevOps, GitHub, or have no Jira licence</li>
+            <li>Both apps share the same test case format, so migration between them is feasible</li>
+          </ul>`,
+        advanced: `<h3 class="qm">App Architecture & APIs</h3>
+          <ul>
+            <li>QTM4J uses Atlassian Forge / Connect — data lives in Atlassian's infrastructure</li>
+            <li>QTM Enterprise exposes a full <strong>REST API</strong> for test cases, executions, and results</li>
+            <li><strong>QMetry MCP server</strong> — allows AI agents (Cursor, Copilot, Claude) to create, run, and query tests autonomously via the Model Context Protocol</li>
+          </ul>`
+      },
+      req: {
+        basics: `<h3 class="qm">Requirements Module</h3>
+          <ul>
+            <li>Link requirements from Jira user stories or create them natively in QMetry</li>
+            <li>Supports <strong>BDD in Gherkin</strong> — Given/When/Then syntax that exports as automation scripts</li>
+            <li>Bulk import via Excel using QMetry's column-mapping wizard</li>
+            <li>Each requirement gets a unique ID, owner, priority, and status</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Requirements Traceability</h3>
+          <ul>
+            <li>Each requirement links to one or many <strong>test cases</strong></li>
+            <li>Coverage matrix shows which requirements have no test coverage (red gap)</li>
+            <li>When a linked test executes, requirement status auto-updates to In Progress / Passed / Failed</li>
+            <li>Traceability Report: Requirements → Test Cases → Executions → Defects — full chain view</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Advanced Requirements Workflow</h3>
+          <ul>
+            <li><strong>Bi-directional Jira sync</strong> — changes to Jira stories auto-reflect in QMetry requirements</li>
+            <li><strong>Version control</strong> — requirements support versioning to track spec changes over time</li>
+            <li><strong>QMetry AI</strong> can auto-generate test cases from requirement text using the Gen AI layer</li>
+          </ul>`
+      },
+      tc: {
+        basics: `<h3 class="qm">Test Cases</h3>
+          <ul>
+            <li>Each test case has: summary, preconditions, test steps, expected results, and attachments</li>
+            <li><strong>Test data parameterisation</strong> — run one test case with multiple data sets using a data table</li>
+            <li>Clone and reuse test cases across projects with the reuse library</li>
+            <li>Label with tags, priorities, and components for filtering</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Test Execution</h3>
+          <ul>
+            <li>Execute tests individually or via Test Suites (cycles)</li>
+            <li>Results: <strong>Pass / Fail / Blocked / In Progress / Not Executed</strong></li>
+            <li>Log defects inline from execution — defect auto-links to the step that failed</li>
+            <li>Attach screenshots and videos to failed steps for rich bug reports</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Automation & Advanced TC Features</h3>
+          <ul>
+            <li>Import automation results from <strong>JUnit, TestNG, Pytest</strong> XML reports</li>
+            <li><strong>Cucumber/JBehave BDD</strong> — Gherkin test cases execute via connected CI/CD and results flow back</li>
+            <li>Reusability Report shows which test cases are reused most — optimise your library</li>
+            <li>QMetry AI detects <strong>duplicate test cases</strong> and <strong>flaky tests</strong> automatically</li>
+          </ul>`
+      },
+      suites: {
+        basics: `<h3 class="qm">Test Suites</h3>
+          <ul>
+            <li>A Test Suite is a collection of test cases grouped for a cycle, sprint, or release</li>
+            <li>Create suites per sprint, environment, or feature area</li>
+            <li>Assign testers to specific tests within a suite</li>
+            <li>Clone suites for regression runs across releases</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Suite Execution & Tracking</h3>
+          <ul>
+            <li>Kick off a suite execution — QMetry tracks progress in real time per tester</li>
+            <li>Dashboard shows % complete, pass rate, blocked count for each active suite</li>
+            <li>Burn-down view shows daily execution pace vs target</li>
+            <li>Suite results feed into System Reports automatically</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Automation & CI/CD Integration</h3>
+          <ul>
+            <li>Trigger suite execution from Jenkins, GitHub Actions, or CircleCI pipelines</li>
+            <li>Pass environment variables and test data overrides via CI triggers</li>
+            <li>Quality gates — block deployments if suite pass rate falls below threshold</li>
+          </ul>`
+      },
+      issues: {
+        basics: `<h3 class="qm">Issues & Defects</h3>
+          <ul>
+            <li>Log defects directly from a failed test step — no context switching</li>
+            <li>Defect includes: test step, environment, assigned tester, screenshot, video</li>
+            <li>Sync to Jira — defect appears as a Jira Bug Issue automatically</li>
+            <li>Defect severity levels: Critical / High / Medium / Low</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Defect Lifecycle</h3>
+          <ul>
+            <li>Full traceability: every issue links back to the test case and execution run</li>
+            <li><strong>Defect Density Report</strong> — shows which modules have the most bugs (hotspot map)</li>
+            <li>Re-test workflow: when a bug is fixed, linked test cases are flagged for re-execution</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Advanced Defect Management</h3>
+          <ul>
+            <li>Azure DevOps sync — bi-directional work item linking for non-Jira teams</li>
+            <li>Custom defect workflows — map to your team's states (Triage → Fix → Verify → Closed)</li>
+            <li>QMetry AI surfaces <strong>defect prediction</strong> — flags areas of the app most likely to regress</li>
+          </ul>`
+      },
+      explore: {
+        basics: `<h3 class="qm">Exploratory Testing</h3>
+          <ul>
+            <li>Script-free, session-based testing ideal for UAT, ad-hoc, and new feature exploration</li>
+            <li>Install the <strong>QMetry Chrome Extension</strong> to begin recording sessions</li>
+            <li>Extension auto-records every click, navigation, and input with timestamps</li>
+            <li>Log defects mid-session with screenshots or video</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Session Management</h3>
+          <ul>
+            <li>Start a session with a <strong>charter/goal</strong> — keeps testing focused</li>
+            <li>End session → QMetry auto-generates a full session report</li>
+            <li>Sessions link to requirements and test cases for full traceability</li>
+            <li>Dramatically cuts documentation time compared to manual note-taking</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Advanced Exploratory Insights</h3>
+          <ul>
+            <li>Session notes can be converted into formal test cases with one click</li>
+            <li>Multiple testers can run parallel exploratory sessions against the same charter</li>
+            <li>Aggregate session findings into a coverage matrix vs. requirements</li>
+          </ul>`
+      },
+      int: {
+        basics: `<h3 class="qm">Integrations</h3>
+          <p>QMetry connects with your entire toolchain:</p>
+          <ul>
+            <li><strong>Issue Trackers</strong> — Jira (bi-directional), Azure DevOps</li>
+            <li><strong>CI/CD</strong> — Jenkins, Bamboo, CircleCI, GitHub Actions, AWS CodePipeline</li>
+            <li><strong>Automation frameworks</strong> — Selenium, Appium, Pytest, JUnit, TestNG, Cucumber</li>
+            <li><strong>Browsers/Devices</strong> — BrowserStack, Sauce Labs</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Setting Up Integrations</h3>
+          <ul>
+            <li>Go to <code>Settings → Integration</code> → select tool → enter credentials → map projects</li>
+            <li>CI/CD integration feeds results back automatically after every build</li>
+            <li><strong>Critical insight</strong>: Setup ≠ value. Usage = value. Ensure test runs are actually triggering the integration.</li>
+            <li>Check for: bugs linked to executions, sync activity, and result imports in the integration log</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Advanced Integration Architecture</h3>
+          <ul>
+            <li><strong>QMetry MCP server</strong> — AI agents can list tests, trigger suites, and query results programmatically</li>
+            <li><strong>REST API</strong> — full coverage of test cases, executions, and defect operations for custom integrations</li>
+            <li><strong>Reflect ↔ QMetry sync</strong> — Reflect test results flow into QMetry test cycles bidirectionally</li>
+            <li>Quality gates in pipelines: block deployments based on QMetry execution pass rates</li>
+          </ul>`
+      },
+      reports: {
+        basics: `<h3 class="qm">System Reports</h3>
+          <ul>
+            <li><strong>Traceability</strong> — Requirements → Test Cases → Executions → Defects</li>
+            <li><strong>Test Execution</strong> — pass/fail/blocked per cycle</li>
+            <li><strong>Defect Report</strong> — issues by severity and assignee</li>
+            <li><strong>Coverage</strong> — % of requirements covered by tests</li>
+            <li><strong>My Dashboard</strong> — personal gadgets with custom widgets</li>
+          </ul>`,
+        intermediate: `<h3 class="qm">Advanced Reports & Dashboards</h3>
+          <ul>
+            <li><strong>QMetry Insight</strong> — SQL-like custom queries with visual charts</li>
+            <li>Schedule reports and email to stakeholders automatically</li>
+            <li>Reusability Report — identifies most reused test cases across the library</li>
+            <li>Multi-project aggregate dashboards for portfolio-level QA visibility</li>
+          </ul>`,
+        advanced: `<h3 class="qm">Strategic Reporting & KPIs</h3>
+          <ul>
+            <li>Track <strong>QA maturity KPIs</strong>: defect leakage rate, test coverage %, automation ratio</li>
+            <li>Export to PDF/Excel for executive reporting</li>
+            <li>Embed dashboard widgets in Confluence pages via the Jira integration</li>
+            <li>Real-time burn-down charts for sprint-level execution tracking</li>
+          </ul>`
+      },
+      qi: {
+        basics: `<h3 class="qm">QMetry Intelligence (QI)</h3>
+          <p>QI is QMetry's Gen AI layer. It uses LLMs to reduce manual QA overhead.</p>
+          <ul>
+            <li><strong>Auto test generation</strong> — generate test cases from user story text</li>
+            <li><strong>Flaky test detection</strong> — flags inconsistent pass/fail patterns</li>
+            <li><strong>Duplicate detection</strong> — finds near-identical test cases in your library</li>
+            <li>Enable under <code>Settings → QMetry Intelligence</code></li>
+          </ul>`,
+        intermediate: `<h3 class="qm">AI Features in Practice</h3>
+          <ul>
+            <li><strong>Predictive coverage</strong> — recommends undertested areas based on change history</li>
+            <li><strong>Smart search</strong> — natural language queries: <em>"show failed payment tests last sprint"</em></li>
+            <li><strong>QQBot</strong> — in-app AI chatbot for instant QMetry help and test suggestions</li>
+            <li>Defect prediction surfaces areas most likely to regress before release</li>
+          </ul>`,
+        advanced: `<h3 class="qm">QMetry MCP Server</h3>
+          <ul>
+            <li>The <strong>QMetry MCP server</strong> exposes full test management capability to any MCP-compatible agent</li>
+            <li>Coding agents (Cursor, Copilot, Claude) can: list tests, trigger suites, read results, create test cases — autonomously</li>
+            <li>Build AI-powered QA pipelines that write, execute, and analyse tests without human intervention</li>
+            <li>Combine with <strong>Reflect MCP</strong> for a fully automated web + mobile testing loop</li>
+          </ul>`
+      },
+    },
+    flashcards: {
+      intro: [
+        {q:'What are the 5 getting started steps in QMetry?',a:'Log in → Create project → Configure users/roles → Select modules → Connect integrations'},
+        {q:'Which two methodologies does QMetry support?',a:'Agile (Scrum/Kanban) AND waterfall — both are fully supported'},
+        {q:'What is the success signal for Stage 1 onboarding?',a:'The customer has executed a test and seen the result inside QMetry'},
+      ],
+      apps: [
+        {q:'What is QTM4J and what makes it special?',a:'QMetry for Jira — a fully embedded Atlassian app. It is Cloud Fortified certified and a StaffPick on the Marketplace'},
+        {q:'When should you choose QTM Enterprise over QTM4J?',a:'When your team works outside Jira or needs a standalone multi-tool environment'},
+      ],
+      req: [
+        {q:'What language does BDD in QMetry use?',a:'Gherkin — Given/When/Then syntax for acceptance criteria that can export as automation scripts'},
+        {q:'How are requirements imported in bulk?',a:'Via Excel using a QMetry template — you map Excel columns to QMetry fields during the import wizard'},
+        {q:'What does the Traceability Report show?',a:'Full chain: Requirements → Test Cases → Executions → Defects'},
+      ],
+      tc: [
+        {q:'What is test data parameterisation?',a:'Running one test case with multiple data sets using a data table — reduces test case duplication'},
+        {q:'What result statuses can a test execution have?',a:'Pass, Fail, Blocked, In Progress, Not Executed'},
+        {q:'How does QI help with test cases?',a:'Detects duplicates, identifies flaky tests, and auto-generates new test cases from user story text'},
+      ],
+      suites:[
+        {q:'What is a Test Suite?',a:'A collection of test cases grouped for a cycle, sprint, or release — executable as a unit'},
+        {q:'How can suites integrate with CI/CD?',a:'Trigger suite execution from Jenkins, GitHub Actions, or CircleCI and set quality gates to block deployments on failure'},
+      ],
+      issues:[
+        {q:'What does the Defect Density Report show?',a:'Which modules have the most bugs — essentially a hotspot map for defect concentration'},
+        {q:'How does defect logging integrate with Jira?',a:'Defects logged in QMetry sync bi-directionally to Jira Bug Issues automatically'},
+      ],
+      explore:[
+        {q:'What tool enables Exploratory Testing capture?',a:'The QMetry Chrome Extension — auto-records clicks, navigation, and inputs during a session'},
+        {q:'What does QMetry auto-generate after an exploratory session ends?',a:'A full session report including all captured actions, defects logged, and screenshots'},
+      ],
+      int:[
+        {q:'What does "setup ≠ value" mean for integrations?',a:'Configuring an integration is not enough — the value comes from actively using it to link bugs, sync results, and trigger runs'},
+        {q:'Name three CI/CD tools QMetry integrates with.',a:'Jenkins, GitHub Actions, CircleCI (also Bamboo, AWS CodePipeline, Azure DevOps)'},
+      ],
+      reports:[
+        {q:'What does the Coverage Report show?',a:'The percentage of requirements that have at least one linked test case'},
+        {q:'What is QMetry Insight?',a:'An advanced reporting layer with SQL-like custom queries and visual chart builders for custom dashboards'},
+      ],
+      qi:[
+        {q:'What is QQBot?',a:'QMetry\'s in-app AI chatbot for instant help, test suggestions, and natural language queries about your QA data'},
+        {q:'What does the QMetry MCP server enable?',a:'AI coding agents to list, create, execute, and query tests autonomously via the Model Context Protocol'},
+      ],
+    },
+  },
+
+  reflect: {
+    label: 'Reflect',
+    desc: 'AI-powered no-code test automation for web & mobile',
+    badgeClass: 'badge-rf',
+    color: 'rf',
+    accent: '#6c8fff',
+    modules: [
+      { id:'overview',   icon:'🔭', name:'What is Reflect?',     section:'Foundations' },
+      { id:'quickstart', icon:'⚡', name:'Quick Start',          section:'Foundations' },
+      { id:'recording',  icon:'🎥', name:'Recording Tests',      section:'Core Features' },
+      { id:'ai',         icon:'🤖', name:'AI Test Creation',     section:'Core Features' },
+      { id:'mobile',     icon:'📱', name:'Mobile Testing',       section:'Core Features' },
+      { id:'segments',   icon:'🧩', name:'Segments & Reuse',     section:'Advanced' },
+      { id:'manage',     icon:'📂', name:'Managing Tests',       section:'Advanced' },
+      { id:'suites',     icon:'🗂️', name:'Test Suites',          section:'Advanced' },
+      { id:'cicd',       icon:'⚙️', name:'CI/CD Integration',    section:'Integrations' },
+      { id:'allint',     icon:'🔗', name:'All Integrations',     section:'Integrations' },
+    ],
+    content: {
+      overview: {
+        basics: `<h3 class="sw">What is SmartBear Reflect?</h3>
+          <p>Reflect is an <strong>AI-powered, no-code test automation platform</strong> for web, mobile (iOS/Android), and API testing — acquired by SmartBear in January 2024.</p>
+          <ul>
+            <li>No selector knowledge required — tests use plain-English instructions</li>
+            <li>Powered by <strong>HaloAI</strong> — SmartBear's generative AI layer (built on OpenAI LLMs)</li>
+            <li>Every test execution captures video, pass/fail per step, console logs, and network logs</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">HaloAI & Self-Healing</h3>
+          <ul>
+            <li><strong>HaloAI</strong> — the AI engine that interprets plain-English step instructions and executes them against the live page state</li>
+            <li>Self-healing: if a page element moves or changes, HaloAI re-identifies it using visual context, not brittle CSS selectors</li>
+            <li>Natural language step: <em>"Click the Add to Cart button"</em> — works regardless of underlying DOM structure</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Reflect MCP Server</h3>
+          <ul>
+            <li>Reflect exposes a <strong>Model Context Protocol (MCP) server</strong> — any coding agent (Cursor, Copilot, Claude Code) can list tests, trigger suites, and read results autonomously</li>
+            <li>Combine with QMetry's MCP server for a fully connected test creation → execution → reporting pipeline</li>
+            <li><strong>Tests API + Suites API</strong> provide full REST coverage for custom integrations</li>
+          </ul>`
+      },
+      quickstart: {
+        basics: `<h3 class="sw">5 Steps to Your First Test</h3>
+          <ol style="padding-left:20px">
+            <li style="margin-bottom:6px">Create test</li>
+            <li style="margin-bottom:6px">Set URL & device</li>
+            <li style="margin-bottom:6px">Begin recording</li>
+            <li style="margin-bottom:6px">Interact normally with the page</li>
+            <li>Save & review Test Run</li>
+          </ol>
+          <p style="margin-top:12px">Each Test Run captures: <strong>video</strong>, pass/fail per step, console logs, and network logs.</p>`,
+        intermediate: `<h3 class="sw">Recording Tips</h3>
+          <ul>
+            <li>Reflect <strong>disables inputs during page load</strong> — this prevents false-positive failures from premature interaction</li>
+            <li>Inputs re-enable automatically once the page is fully loaded</li>
+            <li>Use <strong>Segments</strong> to extract reusable steps (e.g. login flow) that can be shared across multiple tests</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Reflect Tunnel</h3>
+          <ul>
+            <li><strong>Reflect Tunnel</strong> — a secure tunnel for testing private/internal environments</li>
+            <li>Works with all CI/CD integrations without firewall changes</li>
+            <li>Ideal for staging environments, localhost testing, and behind-VPN applications</li>
+          </ul>`
+      },
+      recording: {
+        basics: `<h3 class="sw">Record-and-Replay Testing</h3>
+          <ul>
+            <li>Click "Begin recording" → interact with your web app → Reflect captures every action as a test step</li>
+            <li>Steps are rendered as plain-English instructions, not code</li>
+            <li>Add <strong>assertions (validations)</strong> inline — e.g. "Verify the page title contains 'Checkout'"</li>
+            <li>Save → Reflect immediately runs the test and shows you video evidence</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Editing & Maintaining Tests</h3>
+          <ul>
+            <li>Edit any step inline — change the instruction text to update behaviour</li>
+            <li><strong>Re-record</strong> — re-run the recording flow to update steps after UI changes</li>
+            <li>Insert steps between existing ones without re-recording the whole test</li>
+            <li>Add waits, conditional steps, and hover actions from the step editor</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Advanced Recording Features</h3>
+          <ul>
+            <li><strong>Email testing</strong> — Reflect can check for emails sent by your app (e.g. confirm verification emails arrive)</li>
+            <li><strong>SMS testing</strong> — verify SMS flows in your application</li>
+            <li><strong>Visual validation</strong> — compare screenshots pixel-by-pixel for UI regression detection</li>
+            <li><strong>Private environments</strong> — use Reflect Tunnel to record against localhost or staging</li>
+          </ul>`
+      },
+      ai: {
+        basics: `<h3 class="sw">AI Test Creation</h3>
+          <ul>
+            <li>Each step is a <strong>plain-English prompt</strong>: <em>"Click the Sign In button"</em>, <em>"Enter 'test@example.com' in the email field"</em></li>
+            <li>At runtime, Reflect's AI engine analyses the <strong>current page state</strong> and executes the instruction — no selectors needed</li>
+            <li>Generate entire tests from a text description of the user journey</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">AI-Powered Resilience</h3>
+          <ul>
+            <li><strong>Self-healing</strong> — if a UI element changes, AI re-identifies it by context, visual appearance, and surrounding content</li>
+            <li>No brittle CSS selectors or XPaths to maintain after UI updates</li>
+            <li>Steps survive redesigns because they describe <em>intent</em>, not implementation</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Reflect MCP & Agentic Testing</h3>
+          <ul>
+            <li>The Reflect MCP server lets coding agents interact with Reflect programmatically</li>
+            <li>Agents can: <em>create a test for the checkout flow</em>, <em>run the smoke suite</em>, <em>get results for the last run</em></li>
+            <li>Build fully automated test pipelines that write, execute, and analyse tests without human input</li>
+          </ul>`
+      },
+      mobile: {
+        basics: `<h3 class="sw">Mobile Testing (iOS & Android)</h3>
+          <ul>
+            <li>Reflect Mobile uses <strong>computer vision and AI</strong> — not Appium selectors</li>
+            <li>Steps are plain-English instructions interpreted against the <strong>visual state</strong> of the device screen</li>
+            <li>Works for both native apps and mobile web</li>
+            <li>No Appium setup, no device farm configuration overhead</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Mobile Recording Flow</h3>
+          <ul>
+            <li>Connect a real device or use a cloud device (BrowserStack, Sauce Labs)</li>
+            <li>Record steps visually — Reflect shows a live preview of the device screen</li>
+            <li>Computer vision identifies buttons, inputs, and UI elements without element IDs</li>
+            <li>Same test format as web — teams can use one tool for both platforms</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Cross-Platform Strategy</h3>
+          <ul>
+            <li>Share <strong>Segments</strong> (reusable step groups) between web and mobile tests where flows overlap</li>
+            <li>Run the same functional test on web + iOS + Android in parallel from one Suite Execution</li>
+            <li>Mobile test results flow into the same Test Run view as web — unified reporting</li>
+          </ul>`
+      },
+      segments: {
+        basics: `<h3 class="sw">Segments</h3>
+          <ul>
+            <li>A Segment is a <strong>reusable group of steps</strong> — e.g. login, checkout, search</li>
+            <li>Extract repeated step sequences from individual tests into a shared Segment</li>
+            <li>Insert a Segment into any test — updates to the Segment propagate to all tests that use it</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Managing Segments</h3>
+          <ul>
+            <li>Segments have their own version history — roll back to a previous version if needed</li>
+            <li>Tag Segments (login, navigation, payment) for easy discovery</li>
+            <li>Segment changes trigger automatic re-runs of dependent tests to catch regressions</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Segment Strategy for Scale</h3>
+          <ul>
+            <li>Build a <strong>Segment library</strong> per product area — reduces test creation time by 60-80%</li>
+            <li>Enforce standards: shared login Segment ensures all tests use the same auth flow</li>
+            <li>Nest Segments — a "complete checkout" Segment can include a "login" sub-Segment</li>
+          </ul>`
+      },
+      manage: {
+        basics: `<h3 class="sw">Managing Tests & Test Runs</h3>
+          <ul>
+            <li>Tests list: search, filter, tag, and organise all tests in your account</li>
+            <li>Each test shows its last run status, last run date, and suite membership</li>
+            <li><strong>Test Run</strong> — every execution creates a Run with full video, logs, and per-step results</li>
+            <li>Run history is retained — compare runs across time to spot regressions</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Test Organisation Best Practices</h3>
+          <ul>
+            <li>Use <strong>tags</strong> to group by feature, priority, or owner</li>
+            <li>Archive deprecated tests instead of deleting — preserves run history</li>
+            <li>Use the <strong>Tests API</strong> to programmatically manage tests from CI/CD pipelines</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Tests API & Automation</h3>
+          <ul>
+            <li>Full REST API: create, list, update, delete tests; trigger runs; retrieve results</li>
+            <li>Webhook support — receive POST notifications when a run completes or fails</li>
+            <li>Integrate run results into custom dashboards via the API</li>
+          </ul>`
+      },
+      suites: {
+        basics: `<h3 class="sw">Test Suites in Reflect</h3>
+          <ul>
+            <li>A Suite groups tests for execution as a batch — smoke tests, regression, release check</li>
+            <li>Suites can run on a <strong>schedule</strong> (e.g. every night at 2am) or on-demand</li>
+            <li>Results aggregate per Suite Execution — see overall pass/fail at a glance</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Scheduling & Notifications</h3>
+          <ul>
+            <li>Set cron-style schedules per suite — hourly, daily, or custom intervals</li>
+            <li><strong>Slack notifications</strong> — post suite results to a channel automatically</li>
+            <li><strong>Email notifications</strong> — send run summaries to stakeholders after each execution</li>
+            <li>Filter notification triggers: only alert on failures, or always</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Suite Execution with QM Integration</h3>
+          <ul>
+            <li>Suite Executions in Reflect automatically create a <strong>Test Cycle in QMetry</strong>, <strong>Test Run in TestRail</strong>, <strong>Test Execution in Xray</strong>, or <strong>Test Cycle in Zephyr</strong></li>
+            <li>"Auto-link new tests" option enabled by default in Integration Settings</li>
+            <li>Quality gates: fail a CI/CD pipeline if suite pass rate drops below threshold</li>
+          </ul>`
+      },
+      cicd: {
+        basics: `<h3 class="sw">CI/CD Integration</h3>
+          <ul>
+            <li><strong>GitHub Actions</strong> — native YAML action, add to any workflow in minutes</li>
+            <li><strong>CircleCI Orb</strong> — one-line orb import, runs Reflect suites as a pipeline step</li>
+            <li><strong>AWS CodePipeline</strong> — native template for CodeBuild integration</li>
+            <li>All integrations support quality gates: block deployments on test failure</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Setting Up CI/CD</h3>
+          <ul>
+            <li>Generate an API key in Reflect Settings → connect to your CI provider</li>
+            <li>Pass the Suite ID and optional branch/environment overrides in the pipeline config</li>
+            <li>Run results stream back to Reflect in real time — view in the Test Runs dashboard</li>
+            <li>Use <strong>Reflect Tunnel</strong> in CI to test staging environments behind a firewall</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Advanced Pipeline Patterns</h3>
+          <ul>
+            <li>Run multiple suites in parallel (smoke → regression → performance) using pipeline stages</li>
+            <li>Parameterise environments — pass staging vs production URLs as pipeline variables</li>
+            <li>Post results to Slack / notify stakeholders from the CI step using Reflect webhooks</li>
+            <li>Combine with QMetry: Reflect CI results flow into QMetry test cycles automatically</li>
+          </ul>`
+      },
+      allint: {
+        basics: `<h3 class="sw">All Integrations</h3>
+          <p>Reflect integrates across your QA and DevOps stack:</p>
+          <ul>
+            <li><strong>Test Management</strong> — QMetry (bi-directional), TestRail, Zephyr, Xray</li>
+            <li><strong>Issue Tracking</strong> — Jira (create bugs from failed runs with one click)</li>
+            <li><strong>CI/CD</strong> — GitHub Actions, CircleCI, AWS CodePipeline</li>
+            <li><strong>Notifications</strong> — Slack, Email</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">TM Integration Deep Dive</h3>
+          <ul>
+            <li><strong>QMetry</strong>: results sync bi-directionally — QMetry test cases can be automated via Reflect and results flow back into QMetry cycles</li>
+            <li><strong>TestRail</strong>: enter username/email + hostname → map Reflect tests to TestRail test cases → Suite Executions create TestRail Test Runs automatically</li>
+            <li><strong>Xray</strong>: Suite Executions create Jira Issues of type "Test Execution"</li>
+            <li><strong>Zephyr</strong>: Suite Executions create Zephyr Test Cycles</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Reflect MCP & Custom Integrations</h3>
+          <ul>
+            <li><strong>Reflect MCP server</strong> — expose all test management capability to MCP-compatible agents</li>
+            <li>Agents can list tests, run suites, and read results — fully autonomous QA pipelines</li>
+            <li><strong>Jira bug creation</strong> — when a test fails, one click creates a Jira bug with video, step details, and logs attached</li>
+            <li>Custom integrations via REST API: Tests API + Suites API cover all operations</li>
+          </ul>`
+      },
+    },
+    flashcards: {
+      overview: [
+        {q:'What is SmartBear Reflect?',a:'An AI-powered, no-code test automation platform for web, mobile (iOS/Android), and API testing — acquired by SmartBear in January 2024'},
+        {q:'What is HaloAI?',a:"SmartBear's generative AI layer powering Reflect — built on LLMs (OpenAI) for natural language test creation and self-healing automation"},
+      ],
+      quickstart: [
+        {q:'5 steps to create your first Reflect test?',a:'Create test → Set URL & device → Begin recording → Interact normally → Save & review Test Run'},
+        {q:'What does a Reflect Test Run capture?',a:'Video recording, pass/fail per step, console logs, and network logs for every execution'},
+      ],
+      recording: [
+        {q:'Why does Reflect disable inputs during page load?',a:'To prevent recording actions that result in false-positive failures — inputs re-enable once the page is fully loaded'},
+        {q:'What types of validation can you add to Reflect tests?',a:'Visual validation (pixel-by-pixel screenshot comparison), text assertions, element visibility checks, email and SMS verification'},
+      ],
+      ai: [
+        {q:'How does AI test creation work in Reflect?',a:"Each step is a plain-English prompt. At runtime, Reflect's AI engine analyses the current page state and executes the instruction — no selectors needed"},
+        {q:'What is the Reflect MCP server?',a:'A Model Context Protocol server that lets coding agents (Cursor, Copilot, Claude) list tests, run suites, and read results autonomously'},
+      ],
+      mobile: [
+        {q:'How does Reflect Mobile record tests?',a:'Using computer vision and AI — not Appium selectors. Steps are plain-English instructions interpreted at runtime against the visual state of the device'},
+        {q:'What advantage does computer vision give over Appium?',a:'No element IDs or XPaths needed — tests survive UI redesigns because they describe visual intent, not DOM structure'},
+      ],
+      segments: [
+        {q:'What is a Segment in Reflect?',a:'A reusable group of test steps (e.g. login flow) that can be inserted into multiple tests — updates propagate to all tests using the segment'},
+        {q:'What happens when you update a Segment?',a:'All tests containing that Segment automatically pick up the change — no manual updates needed across individual tests'},
+      ],
+      manage: [
+        {q:'What does a Test Run contain?',a:'Full video of the execution, per-step pass/fail results, console logs, and network logs'},
+        {q:'How do you manage tests programmatically in Reflect?',a:'Via the Tests API — full REST coverage for creating, listing, updating, triggering, and retrieving test results'},
+      ],
+      suites: [
+        {q:'What does a Suite Execution create in QMetry?',a:'A QMetry Test Cycle — with all Reflect test results synced bidirectionally'},
+        {q:'What scheduling options does Reflect support for Suites?',a:'Cron-style schedules: hourly, daily, nightly, or custom intervals — plus on-demand triggering from CI/CD'},
+      ],
+      cicd: [
+        {q:'Name three CI/CD integrations Reflect supports natively.',a:'GitHub Actions, CircleCI Orb, and AWS CodePipeline (native template for CodeBuild)'},
+        {q:'What is Reflect Tunnel used for?',a:'A secure tunnel that lets Reflect test private/internal environments (localhost, staging behind VPN) without firewall changes'},
+      ],
+      allint: [
+        {q:'How does Reflect integrate with Jira on test failure?',a:'One click from the failed Test Run creates a Jira bug with video, step details, and logs automatically attached'},
+        {q:'What is the "auto-link new tests" setting in Reflect?',a:'An option (enabled by default) that automatically maps new Reflect tests to their counterparts in connected TM tools (QMetry, TestRail, Xray, Zephyr)'},
+      ],
+    },
+  },
+
+  swagger: {
+    label: 'Swagger Studio',
+    desc: 'OpenAPI design-first platform for API development',
+    badgeClass: 'badge-sw',
+    color: 'sw',
+    accent: '#85EA2D',
+    modules: [
+      { id:'overview',   icon:'📐', name:'What is Swagger?',      section:'Foundations' },
+      { id:'quickstart', icon:'⚡', name:'Quick Start',           section:'Foundations' },
+      { id:'editor',     icon:'✏️', name:'Code Editor',           section:'Core Features' },
+      { id:'form',       icon:'📝', name:'Form Editor',           section:'Core Features' },
+      { id:'openapi',    icon:'📋', name:'OpenAPI Spec',          section:'Core Features' },
+      { id:'docs',       icon:'📖', name:'Interactive Docs',      section:'Advanced' },
+      { id:'codegen',    icon:'⚙️', name:'Code Generation',       section:'Advanced' },
+      { id:'governance', icon:'✅', name:'API Governance',         section:'Advanced' },
+      { id:'integrations',icon:'🔗', name:'Integrations',         section:'Integrations' },
+      { id:'collaborate',icon:'👥', name:'Collaboration',         section:'Integrations' },
+    ],
+    content: {
+      overview: {
+        basics: `<h3 class="sw">What is SmartBear Swagger Studio?</h3>
+          <p>Swagger Studio is a <strong>Design-First API development platform</strong> for creating, documenting, and managing OpenAPI and AsyncAPI specifications — acquired by SmartBear in 2015 and now the industry standard for API design.</p>
+          <ul>
+            <li>Write APIs in <strong>OpenAPI 3.0/3.1/3.2</strong> or <strong>AsyncAPI 2.x/3.x</strong> format</li>
+            <li>Real-time visual documentation as you type</li>
+            <li>Cloud-based — APIs stored in Swagger Studio cloud, synced to GitHub/GitLab/Bitbucket</li>
+            <li>Free tier available with unlimited public APIs</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Design-First vs Code-First</h3>
+          <ul>
+            <li><strong>Design-First</strong> — write the OpenAPI spec before implementing the API. Swagger Studio's core philosophy: design → validate → generate stubs → implement</li>
+            <li>Benefits: stakeholder review before coding, contract testing, parallel frontend/backend development</li>
+            <li><strong>Code-First</strong> — generate the spec from existing code (Swagger annotations, reflection). Swagger Codegen supports this flow</li>
+            <li>Swagger Studio excels at design-first: split-pane editor, live docs, validation, and mocking</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Swagger Ecosystem</h3>
+          <ul>
+            <li><strong>Swagger Studio</strong> — API design platform (cloud SaaS)</li>
+            <li><strong>Swagger Editor</strong> — open-source editor (runs locally or at editor.swagger.io)</li>
+            <li><strong>Swagger UI</strong> — renders OpenAPI specs as interactive docs (open source)</li>
+            <li><strong>Swagger Codegen</strong> — generates server stubs and client SDKs from OpenAPI specs (open source)</li>
+            <li><strong>Swagger Inspector</strong> — API testing tool that generates OpenAPI specs from requests</li>
+            <li><strong>Swagger Portal</strong> — developer portal for publishing API docs to external consumers</li>
+          </ul>`
+      },
+      quickstart: {
+        basics: `<h3 class="sw">5 Steps to Your First API</h3>
+          <ol style="padding-left:20px">
+            <li style="margin-bottom:6px">Sign up for Swagger Studio (free tier available)</li>
+            <li style="margin-bottom:6px">Click <strong>Create New → API</strong> from the sidebar</li>
+            <li style="margin-bottom:6px">Choose a template (Simple API, Petstore, or None)</li>
+            <li style="margin-bottom:6px">Edit the YAML in the left pane — docs update live on the right</li>
+            <li>Click <strong>Save</strong> — your API is now stored in the cloud</li>
+          </ol>
+          <p style="margin-top:12px">The split-pane view shows: <strong>Code editor (left)</strong> + <strong>Interactive docs (right)</strong>. Resize panels by dragging the splitter.</p>`,
+        intermediate: `<h3 class="sw">Editor Shortcuts</h3>
+          <ul>
+            <li><strong>Ctrl+Space</strong> — autocomplete (suggests valid OpenAPI fields at cursor position)</li>
+            <li><strong>Ctrl+S</strong> — save</li>
+            <li><strong>Ctrl+F</strong> — find in YAML</li>
+            <li>Left sidebar navigation jumps to operations and models in the YAML</li>
+            <li>Validation errors appear inline with red squiggly underlines — hover for details</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Import Existing APIs</h3>
+          <ul>
+            <li>Import from <strong>URL, file, Postman Collection, or GraphQL schema</strong></li>
+            <li>Swagger Studio auto-converts Swagger 2.0 → OpenAPI 3.0 on import</li>
+            <li>Import Stoplight projects via Data Migration wizard (APIs + Markdown docs)</li>
+            <li>Fork an existing API to create a new version or variant</li>
+          </ul>`
+      },
+      editor: {
+        basics: `<h3 class="sw">Code Editor</h3>
+          <ul>
+            <li>Full-featured YAML/JSON editor with syntax highlighting</li>
+            <li><strong>Real-time validation</strong> — errors shown inline as you type</li>
+            <li>Autocomplete for OpenAPI/AsyncAPI keywords and $ref paths</li>
+            <li>Collapsible code blocks for easy navigation in large specs</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Editor Features</h3>
+          <ul>
+            <li><strong>Split editing</strong> — open two versions side-by-side for comparison</li>
+            <li><strong>Diff mode</strong> — compare any two versions of an API</li>
+            <li><strong>Undo/Redo</strong> — full history within a session</li>
+            <li><strong>Search & replace</strong> — across the entire spec</li>
+            <li>YAML ↔ JSON toggle — switch between formats instantly</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Draft Editor</h3>
+          <ul>
+            <li><strong>Draft Editor</strong> — AI-powered plain-English API designer</li>
+            <li>Describe your API in natural language — Swagger Studio generates the OpenAPI spec</li>
+            <li>Example: "Create a GET endpoint for retrieving user profiles by ID"</li>
+            <li>The generated spec appears in the Code Editor for refinement</li>
+          </ul>`
+      },
+      form: {
+        basics: `<h3 class="sw">Form Editor (Visual Mode)</h3>
+          <ul>
+            <li>GUI-based editor for OpenAPI specs — no YAML knowledge required</li>
+            <li>Add paths, operations, parameters, request/response bodies via forms</li>
+            <li>Instant sync with Code Editor — changes reflect in both views</li>
+            <li>Ideal for non-technical stakeholders reviewing API design</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Form vs Code</h3>
+          <ul>
+            <li>Use <strong>Form Editor</strong> for high-level structure (paths, operations, schemas)</li>
+            <li>Use <strong>Code Editor</strong> for fine-grained control (vendor extensions, examples, complex schemas)</li>
+            <li>Switch between them seamlessly — they edit the same underlying spec</li>
+            <li>Form Editor supports OpenAPI 3.0/3.1 — not all 3.2 features yet</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Form Editor Workflow</h3>
+          <ul>
+            <li>Start with Form Editor for stakeholder review → switch to Code Editor for implementation details</li>
+            <li>Use Form Editor to onboard junior developers unfamiliar with YAML</li>
+            <li>Form Editor does not support <code>$ref</code> inline editing — use Code Editor for that</li>
+          </ul>`
+      },
+      openapi: {
+        basics: `<h3 class="sw">OpenAPI Specification Basics</h3>
+          <ul>
+            <li>OpenAPI = machine-readable API description in YAML or JSON</li>
+            <li><strong>Key sections:</strong> info, servers, paths, components, security</li>
+            <li><strong>Paths</strong> define endpoints (e.g. <code>/users/{id}</code>)</li>
+            <li><strong>Operations</strong> define HTTP methods (GET, POST, PUT, DELETE)</li>
+            <li><strong>Components</strong> hold reusable schemas, parameters, responses</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">OpenAPI Structure</h3>
+          <ul>
+            <li><strong>Info section</strong> — title, version, description, contact, license</li>
+            <li><strong>Servers</strong> — base URLs for dev, staging, prod environments</li>
+            <li><strong>Paths</strong> — each path has operations (get, post, etc.) with parameters, request bodies, responses</li>
+            <li><strong>Components/schemas</strong> — define data models (e.g. User, Product) reused across endpoints</li>
+            <li><strong>Security</strong> — API key, OAuth2, HTTP auth schemes</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Advanced OpenAPI Features</h3>
+          <ul>
+            <li><strong>$ref</strong> — reference reusable components (local or external URLs)</li>
+            <li><strong>Domains</strong> — shared component libraries in Swagger Studio for multi-API reuse</li>
+            <li><strong>Callbacks</strong> — define webhook endpoints (OpenAPI 3.0+)</li>
+            <li><strong>Discriminators</strong> — polymorphic request/response types</li>
+            <li><strong>Examples</strong> — provide sample request/response payloads for documentation</li>
+          </ul>`
+      },
+      docs: {
+        basics: `<h3 class="sw">Interactive API Documentation</h3>
+          <ul>
+            <li>Auto-generated from your OpenAPI spec — updates in real time as you edit</li>
+            <li>Shows all endpoints, parameters, request/response schemas, examples</li>
+            <li><strong>"Try it out"</strong> button lets you execute API calls directly from the docs</li>
+            <li>Requires CORS configuration on your server for live testing</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Customizing Documentation</h3>
+          <ul>
+            <li><strong>Custom branding</strong> — add your logo, custom CSS, and header/footer (paid plans)</li>
+            <li><strong>Public vs Private</strong> — control visibility (public = discoverable, private = auth required)</li>
+            <li><strong>Markdown support</strong> — add rich descriptions with formatting, code blocks, links</li>
+            <li>Embed docs in your own site via <code>&lt;iframe&gt;</code> or Swagger UI</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Publishing to Swagger Portal</h3>
+          <ul>
+            <li><strong>Swagger Portal</strong> — developer portal for external API consumers</li>
+            <li>Publish multiple APIs to one portal with unified navigation and branding</li>
+            <li>Add Markdown pages for guides, tutorials, and getting started content</li>
+            <li>Portal supports external IdP (SAML, OAuth) for consumer access control</li>
+          </ul>`
+      },
+      codegen: {
+        basics: `<h3 class="sw">Code Generation</h3>
+          <ul>
+            <li>Generate <strong>server stubs</strong> in 40+ languages/frameworks (Node.js, Spring Boot, Flask, Go, etc.)</li>
+            <li>Generate <strong>client SDKs</strong> in 50+ languages (JavaScript, Python, Java, C#, Ruby, etc.)</li>
+            <li>Stubs include boilerplate routing and request/response handling</li>
+            <li>Powered by <strong>Swagger Codegen</strong> (open source) — customizable templates</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Codegen Workflow</h3>
+          <ul>
+            <li>From Swagger Studio: <strong>Export → Generate Server / Generate Client</strong></li>
+            <li>Select language/framework → optionally configure generation options</li>
+            <li>Download a ZIP file with generated code</li>
+            <li>Implement business logic in the generated stub functions</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Advanced Codegen</h3>
+          <ul>
+            <li><strong>Custom templates</strong> — override default Mustache templates for your org's standards</li>
+            <li><strong>Gradle/Maven plugins</strong> — automate codegen in your build pipeline</li>
+            <li><strong>CLI</strong> — <code>swagger-codegen generate -i spec.yaml -l nodejs-server</code></li>
+            <li><strong>MCP Server generation</strong> — Swagger Studio can generate Model Context Protocol servers from your OpenAPI spec for AI agent integration</li>
+          </ul>`
+      },
+      governance: {
+        basics: `<h3 class="sw">API Governance</h3>
+          <ul>
+            <li>Enforce <strong>API design standards</strong> across your organization</li>
+            <li><strong>Spectral</strong> — open-source linter integrated into Swagger Studio</li>
+            <li>Built-in rulesets: <strong>OpenAPI, OWASP Top 10 API Security</strong></li>
+            <li>Validation runs automatically on every save — errors block publishing</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Custom Style Guides</h3>
+          <ul>
+            <li>Import <strong>Spectral style guides</strong> (.yaml rulesets) into Swagger Studio</li>
+            <li>Rules can enforce: naming conventions, required fields, security schemes, HTTP status codes</li>
+            <li>Example rule: "All endpoints must have a description of at least 20 characters"</li>
+            <li>Org-wide style guides ensure consistency across 100s of APIs</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Governance at Scale</h3>
+          <ul>
+            <li><strong>Projects</strong> — group related APIs and domains under a single governance policy</li>
+            <li><strong>Teams</strong> — assign teams to projects with granular role-based access (Owner, Editor, Viewer)</li>
+            <li><strong>Audit logs</strong> — track who changed what, when (Enterprise plan)</li>
+            <li><strong>Stoplight migration</strong> — import Spectral style guides from Stoplight to Swagger Studio</li>
+          </ul>`
+      },
+      integrations: {
+        basics: `<h3 class="sw">Integrations Overview</h3>
+          <ul>
+            <li><strong>Source control</strong> — GitHub, GitLab, Bitbucket, Azure DevOps (bi-directional sync)</li>
+            <li><strong>API Gateways</strong> — Amazon API Gateway, Apigee, Azure API Management</li>
+            <li><strong>CI/CD</strong> — GitHub Actions, CircleCI, Jenkins via webhooks</li>
+            <li><strong>Mocking</strong> — API Auto Mocking generates a live mock server from your spec</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Source Control Sync</h3>
+          <ul>
+            <li>Two-way sync: edit in Swagger Studio → pushes to GitHub; edit in GitHub → pulls to Swagger Studio</li>
+            <li>Select branch, file path, and sync direction (push, pull, or both)</li>
+            <li>Swagger Studio commits include commit messages and user attribution</li>
+            <li>Ideal for GitOps workflows where the OpenAPI spec is the source of truth</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Advanced Integrations</h3>
+          <ul>
+            <li><strong>API Auto Mocking</strong> — Swagger Studio spins up a mock API server at a unique URL. Responds with examples from your spec.</li>
+            <li><strong>Amazon API Gateway + Lambda</strong> — deploy your OpenAPI spec directly to AWS with auto-generated Lambda stubs</li>
+            <li><strong>IntelliJ / VS Code</strong> — edit Swagger Studio APIs locally with IDE plugins (push changes back to cloud)</li>
+            <li><strong>SmartBear MCP Server</strong> — exposes Swagger Studio APIs to AI agents for autonomous API management</li>
+          </ul>`
+      },
+      collaborate: {
+        basics: `<h3 class="sw">Collaboration Features</h3>
+          <ul>
+            <li><strong>Organizations</strong> — invite team members, manage roles (Owner, Collaborator, Consumer)</li>
+            <li><strong>Comments</strong> — inline comments on any line of the OpenAPI spec for review</li>
+            <li><strong>Projects</strong> — group APIs under a project for shared governance and access control</li>
+            <li><strong>Forking</strong> — create a copy of an API to propose changes (like GitHub forks)</li>
+          </ul>`,
+        intermediate: `<h3 class="sw">Sharing & Permissions</h3>
+          <ul>
+            <li><strong>Public APIs</strong> — discoverable on Swagger Studio public registry</li>
+            <li><strong>Private APIs</strong> — visible only to org members</li>
+            <li><strong>Share links</strong> — generate read-only links for external stakeholders</li>
+            <li><strong>Versioning</strong> — maintain multiple versions (1.0.0, 1.1.0, 2.0.0) with separate URLs</li>
+          </ul>`,
+        advanced: `<h3 class="sw">Enterprise Collaboration</h3>
+          <ul>
+            <li><strong>Teams</strong> — assign users to teams with inherited permissions across projects</li>
+            <li><strong>Compare & Merge</strong> — diff two API versions side-by-side and merge changes</li>
+            <li><strong>External IdP</strong> — SSO via SAML, OAuth for org-wide authentication</li>
+            <li><strong>Confluence integration</strong> — embed Swagger Studio docs in Confluence for stakeholder review</li>
+          </ul>`
+      },
+    },
+    flashcards: {
+      overview: [
+        {q:"What is Swagger Studio\'s core philosophy?",a:"Design-First, Code-Later — write the OpenAPI spec before implementing the API"},
+        {q:"What formats does Swagger Studio support?",a:"OpenAPI 3.0/3.1/3.2 and AsyncAPI 2.x/3.x, in YAML or JSON"},
+      ],
+      quickstart: [
+        {q:"What are the 5 steps to create your first API in Swagger Studio?",a:"Sign up → Create New API → Choose template → Edit YAML → Save"},
+        {q:"What does Ctrl+Space do in the Swagger Studio editor?",a:"Autocomplete — suggests valid OpenAPI fields at the current cursor position"},
+      ],
+      editor: [
+        {q:"What is the Draft Editor in Swagger Studio?",a:"An AI-powered tool that generates OpenAPI specs from plain-English descriptions of your API"},
+        {q:"What is Diff Mode?",a:"A feature that compares two versions of an API side-by-side to show changes"},
+      ],
+      form: [
+        {q:"What is the Form Editor used for?",a:"A GUI-based visual editor for OpenAPI specs — no YAML knowledge required, ideal for non-technical stakeholders"},
+        {q:"Can you switch between Form Editor and Code Editor?",a:"Yes — they edit the same underlying spec and sync instantly"},
+      ],
+      openapi: [
+        {q:"What are the 5 key sections of an OpenAPI spec?",a:"info, servers, paths, components, security"},
+        {q:"What is $ref in OpenAPI?",a:"A keyword for referencing reusable components (local or external URLs) to avoid duplication"},
+      ],
+      docs: [
+        {q:'What does "Try it out" do in Swagger Studio docs?',a:'Executes API calls directly from the interactive documentation — requires CORS configuration on the server'},
+        {q:"What is Swagger Portal?",a:"A developer portal for publishing multiple APIs with unified navigation, branding, and external consumer access"},
+      ],
+      codegen: [
+        {q:"How many languages does Swagger Codegen support?",a:"40+ server stub languages and 50+ client SDK languages"},
+        {q:"What is MCP Server generation in Swagger Studio?",a:"Generating Model Context Protocol servers from OpenAPI specs for AI agent integration"},
+      ],
+      governance: [
+        {q:"What tool does Swagger Studio use for API governance?",a:"Spectral — an open-source linter integrated into Swagger Studio for enforcing design standards"},
+        {q:"What are the two built-in Swagger Studio rulesets?",a:"OpenAPI and OWASP Top 10 API Security"},
+      ],
+      integrations: [
+        {q:"Name three source control systems Swagger Studio syncs with.",a:"GitHub, GitLab, Bitbucket (also Azure DevOps)"},
+        {q:"What is API Auto Mocking?",a:"A feature that spins up a live mock API server from your OpenAPI spec at a unique URL"},
+      ],
+      collaborate: [
+        {q:"What are the three member roles in a Swagger Studio organization?",a:"Owner, Collaborator, Consumer"},
+        {q:"What does forking an API do in Swagger Studio?",a:"Creates a copy of an API to propose changes — like GitHub forks"},
+      ],
+    },
+  },
+};
+
+// ══════════════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════════════
+let loginProduct = 'qmetry';
+
+function selectLoginProduct(p) {
+  loginProduct = p;
+  document.getElementById('choiceQM').className = 'product-choice-btn' + (p==='qmetry' ? ' sel-qm' : '');
+  document.getElementById('choiceRF').className = 'product-choice-btn' + (p==='reflect' ? ' sel-rf' : '');
+  document.getElementById('choiceSW').className = 'product-choice-btn' + (p==='swagger' ? ' sel-sw' : '');
+}
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if (!email) { err.textContent = 'Please enter your email address.'; return; }
+  if (pass !== 'smartbear') { err.textContent = 'Incorrect password. Try: smartbear'; return; }
+  err.textContent = '';
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  product = loginProduct;
+  init();
+}
+
+function doLogout() {
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('chatMessages').innerHTML = '';
+}
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let product = 'qmetry';
+let mode = 'learn';
+let activeModule = null;
+let activeTier = 'basics';
+const completed = { qmetry: {}, reflect: {}, swagger: {} };
+let quizCards = [];
+let quizIdx = 0;
+let quizScore = 0;
+let quizAnswered = false;
+const attempts = { qmetry: {}, reflect: {}, swagger: {} };
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function init() {
+  const P = PRODUCTS[product];
+  activeModule = P.modules[0].id;
+  activeTier = 'basics';
+  mode = 'learn';
+  updateTabUI();
+  renderSidebar();
+  renderContent();
+  addChatMsg('coach', getWelcome());
+}
+
+function getWelcome() {
+  if (product === 'qmetry') {
+    return `Welcome to the <strong>QMetry Product Coach</strong>. I'll guide you through all 10 modules — from getting started all the way to AI features and integrations.<br><br>Pick any module from the sidebar to begin, or switch to <strong>Quiz mode</strong> to test yourself.`;
+  } else if (product === 'reflect') {
+    return `Welcome to the <strong>Reflect Product Coach</strong>. I'll guide you through Reflect's AI-powered test automation — recording, mobile testing, CI/CD, and integrations.<br><br>Select any module from the sidebar, or jump into <strong>Quiz mode</strong>.`;
+  } else {
+    return `Welcome to the <strong>Swagger Studio Product Coach</strong>. I'll guide you through OpenAPI-first API design — from the editor to code generation, governance, and collaboration.<br><br>Choose a module to begin learning, or test your knowledge in <strong>Quiz mode</strong>.`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// PRODUCT SWITCH
+// ══════════════════════════════════════════════════════════
+function switchProduct(p) {
+  product = p;
+  const P = PRODUCTS[product];
+  activeModule = P.modules[0].id;
+  activeTier = 'basics';
+  mode = 'learn';
+  updateTabUI();
+  renderSidebar();
+  renderContent();
+  document.getElementById('chatMessages').innerHTML = '';
+  addChatMsg('coach', getWelcome());
+}
+
+function updateTabUI() {
+  const P = PRODUCTS[product];
+  const c = P.color;
+  document.getElementById('tabQM').className = 'nav-tab' + (product==='qmetry' ? ' active-qm' : '');
+  document.getElementById('tabRF').className = 'nav-tab' + (product==='reflect' ? ' active-rf' : '');
+  document.getElementById('tabSW').className = 'nav-tab' + (product==='swagger' ? ' active-sw' : '');
+}
+
+// ══════════════════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════════════════
+function renderSidebar() {
+  const P = PRODUCTS[product];
+  const c = P.color;
+  document.getElementById('productBadge').className = `product-badge ${P.badgeClass}`;
+  document.getElementById('productBadge').textContent = P.label;
+  document.getElementById('sidebarDesc').textContent = P.desc;
+
+  const total = P.modules.length;
+  const done = Object.keys(completed[product]).length;
+  document.getElementById('progressText').textContent = `${done} / ${total} modules complete`;
+  document.getElementById('progressPct').textContent = `${Math.round(done/total*100)}%`;
+  document.getElementById('progressFill').className = `progress-fill fill-${c}`;
+  document.getElementById('progressFill').style.width = `${done/total*100}%`;
+
+  const sections = [...new Set(P.modules.map(m=>m.section))];
+  let html = '';
+  for (const sec of sections) {
+    html += `<div class="module-section"><div class="module-section-label">${sec}</div>`;
+    for (const m of P.modules.filter(x=>x.section===sec)) {
+      const isActive = m.id === activeModule;
+      const isDone = completed[product][m.id];
+      const cls = isActive ? `module-item active-${c}` : 'module-item';
+      html += `<div class="${cls}" onclick="selectModule('${m.id}')">
+        <span class="module-icon">${m.icon}</span>
+        <span class="module-name">${m.name}</span>
+        ${isDone ? `<span class="module-done" style="color:var(--green)">✓</span>` : ''}
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  document.getElementById('moduleList').innerHTML = html;
+
+  const btnL = document.getElementById('btnLearn');
+  const btnQ = document.getElementById('btnQuiz');
+  btnL.className = `toggle-btn ${mode==='learn' ? 'active-'+c : ''}`;
+  btnQ.className = `toggle-btn ${mode==='quiz' ? 'active-'+c : ''}`;
+}
+
+function selectModule(id) {
+  activeModule = id;
+  activeTier = 'basics';
+  renderSidebar();
+  if (mode === 'quiz') { startQuiz(); } else { renderContent(); }
+}
+
+function setMode(m) {
+  mode = m;
+  renderSidebar();
+  if (m === 'quiz') { startQuiz(); } else { activeTier = 'basics'; renderContent(); }
+}
+
+// ══════════════════════════════════════════════════════════
+// LEARN MODE
+// ══════════════════════════════════════════════════════════
+function renderContent() {
+  const P = PRODUCTS[product];
+  const c = P.color;
+  const m = P.modules.find(x=>x.id===activeModule);
+  const cont = P.content[activeModule];
+  const tiers = ['basics','intermediate','advanced'];
+  const tierLabels = ['Basics','Intermediate','Advanced'];
+  let recTier = adaptiveTierRecommendation();
+  let tiersHtml = tiers.map((t,i) => {
+    const cls = t===activeTier ? `tier-tab active-${c}` : 'tier-tab';
+    const rec = t===recTier && t!==activeTier ? ' 💡' : '';
+    return `<button class="${cls}" onclick="setTier('${t}')">${tierLabels[i]}${rec}</button>`;
+  }).join('');
+  const prompts = getQuickPrompts();
+  const promptsHtml = prompts.map(p=>`<div class="prompt-chip" onclick="askPrompt('${p}')">${p}</div>`).join('');
+  
+  // Get current border width or default
+  const currentBorder = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lesson-border-width') || '1');
+  
+  document.getElementById('contentArea').innerHTML = `
+    <div class="content-header">
+      <div class="content-title">${m.icon} ${m.name}</div>
+      <div class="tier-tabs">${tiersHtml}</div>
+    </div>
+    <div class="lesson-card" id="lessonCard">${cont[activeTier]}</div>
+    <div style="margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)">Quick questions</div>
+    <div class="quick-prompts">${promptsHtml}</div>
+    <div class="border-control">
+      <div class="border-control-label">Card border width</div>
+      <input type="range" class="border-slider" min="0" max="4" step="0.5" value="${currentBorder}" 
+        oninput="updateBorderWidth(this.value)"/>
+      <div class="border-value" id="borderValue">${currentBorder}px</div>
+    </div>`;
+}
+
+function setTier(t) { activeTier = t; renderContent(); }
+
+function updateBorderWidth(value) {
+  document.documentElement.style.setProperty('--lesson-border-width', value + 'px');
+  document.getElementById('borderValue').textContent = value + 'px';
+  // Update all lesson cards
+  document.querySelectorAll('.lesson-card').forEach(card => {
+    card.style.borderWidth = value + 'px';
+  });
+}
+
+function adaptiveTierRecommendation() {
+  const stats = attempts[product][activeModule];
+  if (!stats) return 'basics';
+  const total = (stats.correct||0) + (stats.wrong||0);
+  if (total === 0) return 'basics';
+  const pct = (stats.correct||0) / total;
+  if (pct >= 0.8) return 'advanced';
+  if (pct >= 0.5) return 'intermediate';
+  return 'basics';
+}
+
+function getQuickPrompts() {
+  const base = {
+    qmetry: {
+      intro:['How is QMetry different from Jira?','What are the key user roles?','How do I set up a project?'],
+      apps:['When should I use QTM4J?','What is the MCP server?','How do I choose between apps?'],
+      req:['How does BDD work in QMetry?','What is the traceability report?','How do I import requirements?'],
+      tc:['What is test parameterisation?','How do I log a defect from a test step?','What automation formats are supported?'],
+      suites:['How do I clone a suite?','What quality gates can I set?','How does the burn-down view work?'],
+      issues:['How does defect density work?','How do I sync defects to Jira?','What is the re-test workflow?'],
+      explore:['What is a session charter?','How does the Chrome Extension work?','Can I convert session notes to test cases?'],
+      int:['What does setup vs value mean?','How do I check if my integration is working?','What CI/CD tools does QMetry support?'],
+      reports:['What is QMetry Insight?','How do I schedule a report?','What is the coverage report?'],
+      qi:['What is QQBot?','How does flaky test detection work?','What is the QMetry MCP server?'],
+    },
+    reflect: {
+      overview:['What is HaloAI?','How does Reflect differ from Selenium?','What does the MCP server do?'],
+      quickstart:['Why are inputs disabled during recording?','What is Reflect Tunnel?','What does a Test Run include?'],
+      recording:['How do I add an assertion?','What is visual validation?','How do I re-record a test?'],
+      ai:['How are AI steps different from selectors?','How does self-healing work?','Can I generate a test from text?'],
+      mobile:['Does Reflect Mobile use Appium?','How does computer vision work?','Can I share segments between web and mobile?'],
+      segments:['How do I create a Segment?','What happens when I update a Segment?','Can I nest Segments?'],
+      manage:['How do I organise tests at scale?','What does the Tests API support?','How do I compare two runs?'],
+      suites:['How do I schedule a suite?','What notifications does Reflect support?','How does QMetry sync work?'],
+      cicd:['How do I set up GitHub Actions?','What is quality gate in CI/CD?','How does Tunnel work in CI?'],
+      allint:['How does Jira bug creation work?','What TM tools does Reflect sync to?','How is the Reflect MCP used?'],
+    }
+  };
+  return base[product]?.[activeModule] || ['Tell me more','Give me an example','How do I get started?'];
+}
+
+function askPrompt(p) { document.getElementById('chatInput').value = p; sendChat(); }
+
+// ══════════════════════════════════════════════════════════
+// QUIZ MODE
+// ══════════════════════════════════════════════════════════
+function startQuiz() {
+  const P = PRODUCTS[product];
+  const cards = P.flashcards[activeModule] || [];
+  quizCards = [...cards].sort(() => Math.random() - 0.5);
+  quizIdx = 0; quizScore = 0; quizAnswered = false;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const P = PRODUCTS[product];
+  const c = P.color;
+  if (quizCards.length === 0) {
+    document.getElementById('contentArea').innerHTML = `<div class="quiz-wrap"><div class="lesson-card"><h3 class="${c}">No quiz available</h3><p>No flashcards found for this module yet.</p></div></div>`;
+    return;
+  }
+  const card = quizCards[quizIdx];
+  const m = P.modules.find(x=>x.id===activeModule);
+  const allCards = Object.values(P.flashcards).flat();
+  const distractors = allCards.filter(x=>x.a !== card.a).sort(()=>Math.random()-.5).slice(0,3);
+  const options = [...distractors, card].sort(()=>Math.random()-.5);
+  document.getElementById('contentArea').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+      <div style="font-size:13px;color:var(--muted);font-weight:500">${m.icon} ${m.name} — Quiz Mode</div>
+      <div class="score-badge">⭐ ${quizScore} / ${quizIdx}</div>
+    </div>
+    <div class="quiz-wrap">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:10px">Question ${quizIdx+1} of ${quizCards.length}</div>
+      <div class="quiz-q">${card.q}</div>
+      <div class="quiz-options" id="quizOpts">
+        ${options.map((o,i)=>`<button class="quiz-opt" id="opt${i}" onclick="checkAnswer(${i},'${escQ(o.a)}','${escQ(card.a)}')">${o.a}</button>`).join('')}
+      </div>
+      <div id="quizFeedback"></div>
+    </div>`;
+}
+
+function escQ(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+function checkAnswer(idx, chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const P = PRODUCTS[product];
+  const c = P.color;
+  const isCorrect = chosen === correct;
+  if (!attempts[product][activeModule]) attempts[product][activeModule] = {correct:0,wrong:0};
+  if (isCorrect) { attempts[product][activeModule].correct++; quizScore++; }
+  else attempts[product][activeModule].wrong++;
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((btn) => {
+    if (btn.textContent === correct) { btn.classList.add(c==='rf' ? 'correct-rf' : 'correct'); }
+    else if (opts[idx] === btn && !isCorrect) { btn.classList.add('wrong'); }
+    btn.disabled = true;
+  });
+  const fbHtml = isCorrect
+    ? `<div class="quiz-feedback ${c==='rf'?'fb-correct-rf':'fb-correct'}">✓ Correct! ${quizCards[quizIdx].a}</div>`
+    : `<div class="quiz-feedback fb-wrong">✗ Not quite. Answer: ${quizCards[quizIdx].a}</div>`;
+  const nextLabel = quizIdx+1 < quizCards.length ? 'Next →' : 'Finish';
+  document.getElementById('quizFeedback').innerHTML = fbHtml +
+    `<button class="next-btn next-${c}" onclick="nextQuiz()">${nextLabel}</button>`;
+}
+
+function nextQuiz() {
+  quizIdx++; quizAnswered = false;
+  if (quizIdx >= quizCards.length) { finishQuiz(); } else { renderQuiz(); }
+}
+
+function finishQuiz() {
+  const P = PRODUCTS[product];
+  const c = P.color;
+  const pct = Math.round(quizScore/quizCards.length*100);
+  const passed = pct >= 50;
+  if (passed) { completed[product][activeModule] = true; renderSidebar(); }
+  let suggestion = '';
+  if (pct < 50) suggestion = `<p style="margin-top:10px;color:var(--muted);font-size:13px">📖 Review the <strong>Basics</strong> tier and try again.</p>`;
+  else if (pct < 80) suggestion = `<p style="margin-top:10px;color:var(--muted);font-size:13px">💡 Good progress — try the <strong>Intermediate</strong> tier to go deeper.</p>`;
+  else suggestion = `<p style="margin-top:10px;color:var(--muted);font-size:13px">🚀 Excellent! Explore the <strong>Advanced</strong> tier for expert content.</p>`;
+  document.getElementById('contentArea').innerHTML = `
+    <div class="quiz-wrap">
+      <div class="lesson-card">
+        <h3 class="${c}">Quiz Complete</h3>
+        <p style="font-size:24px;font-weight:700;margin:10px 0">${pct}% <span style="font-size:13px;font-weight:400;color:var(--muted)">(${quizScore} / ${quizCards.length} correct)</span></p>
+        <p>${passed ? '✅ Module marked complete!' : '📚 Keep practising — aim for 50% to complete the module.'}</p>
+        ${suggestion}
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="next-btn next-${c}" onclick="startQuiz()">Retry Quiz</button>
+          <button class="next-btn next-neutral" onclick="setMode('learn')">Back to Learn</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════════════════════
+function addChatMsg(role, html) {
+  const P = PRODUCTS[product];
+  const c = P.color;
+  const area = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const avatarClass = role==='coach' ? `avatar-coach-${c}` : 'avatar-user';
+  const avatarLabel = role==='coach' ? '◈' : 'U';
+  div.innerHTML = `<div class="msg-avatar ${avatarClass}">${avatarLabel}</div><div class="msg-body">${html}</div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  addChatMsg('user', q);
+  const P = PRODUCTS[product];
+  const m = P.modules.find(x=>x.id===activeModule);
+  const cont = P.content[activeModule];
+  const area = document.getElementById('chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'msg coach';
+  const c = P.color;
+  typing.innerHTML = `<div class="msg-avatar avatar-coach-${c}">◈</div><div class="msg-body typing">Thinking…</div>`;
+  area.appendChild(typing);
+  area.scrollTop = area.scrollHeight;
+  try {
+    const systemPrompt = `You are a product coach for SmartBear's ${P.label} product.
+Current module: "${m.name}".
+Module basics: ${cont.basics.replace(/<[^>]+>/g,'')}
+Module intermediate: ${cont.intermediate.replace(/<[^>]+>/g,'')}
+Module advanced: ${cont.advanced.replace(/<[^>]+>/g,'')}
+Answer clearly and concisely in under 150 words. Use plain text. Reference how ${P.label} connects to ${product==='qmetry'?'Reflect':'QMetry'} when relevant.`;
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+    const data = await resp.json();
+    const answer = data.content?.map(b=>b.text||'').join('') || 'Sorry, I could not get a response.';
+    area.removeChild(typing);
+    addChatMsg('coach', answer.replace(/\n/g,'<br>'));
+  } catch(e) {
+    area.removeChild(typing);
+    addChatMsg('coach', 'Sorry, there was an error reaching the AI. Please try again.');
+  }
+}
+</script>
+</body>
+</html>
